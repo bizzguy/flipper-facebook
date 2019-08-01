@@ -27,9 +27,15 @@ export type Counter = {
   label: string,
 };
 
+export type NameValuePair = {
+   name: string,
+   value: string
+}
+
 type Props = {|
   onChange: (counters: Array<Counter>) => void,
   counters: Array<Counter>,
+  additionalData: Array<string>
 |};
 
 type State = {
@@ -43,11 +49,11 @@ const ColumnSizes = {
 };
 
 const Columns = {
-  expression: {
+  key: {
     value: 'Key',
     resizable: false,
   },
-  count: {
+  value: {
     value: 'Value',
     resizable: false,
   },
@@ -112,6 +118,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
   };
 
   onChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
+    console.log("...running BloodHound.onChange")
     this.setState({
       input: e.target.value,
     });
@@ -127,6 +134,31 @@ export default class LogWatcher extends PureComponent<Props, State> {
   };
 
   buildRows = (): Array<TableBodyRow> => {
+    console.log("...running buildRows")
+    return this.props.counters.map(({label, count, notify}, i) => ({
+      columns: {
+        expression: {
+          value: <Text code={true}>{label}</Text>,
+        },
+        count: {
+          value: <Count onClick={() => this.resetCount(i)}>{count}</Count>,
+        },
+        notify: {
+          value: (
+            <Checkbox
+              type="checkbox"
+              checked={notify}
+              onChange={() => this.setNotification(i, !notify)}
+            />
+          ),
+        },
+      },
+      key: label,
+    }));
+  };
+
+  buildRowsAdditionalData = (): Array<TableBodyRow> => {
+    console.log("...running buildRowsAdditionalData")
     return this.props.counters.map(({label, count, notify}, i) => ({
       columns: {
         expression: {
@@ -159,9 +191,9 @@ export default class LogWatcher extends PureComponent<Props, State> {
   };
 
   onRowHighlighted = (rows: Array<string>) => {
-    this.setState({
-      highlightedRow: rows.length === 1 ? rows[0] : null,
-    });
+    //this.setState({
+    //  highlightedRow: rows.length === 1 ? rows[0] : null,
+    //});
   };
 
   onKeyDown = (e: SyntheticKeyboardEvent<>) => {

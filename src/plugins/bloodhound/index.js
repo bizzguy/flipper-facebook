@@ -12,6 +12,7 @@ import type {
   TableColumns,
 } from 'flipper';
 import type {Counter} from './BloodHound.js';
+import type {NameValuePair} from './BloodHound.js';
 import type {DeviceLogEntry} from '../../devices/BaseDevice.js';
 import type {Props as PluginProps} from '../../plugin';
 
@@ -46,6 +47,7 @@ type State = {|
   key2entry: {[key: string]: DeviceLogEntry},
   highlightedRows: Set<string>,
   counters: Array<Counter>,
+  additionalData: Array<string>
 |};
 
 type Actions = {||};
@@ -337,11 +339,7 @@ export function processEntry(
   };
 }
 
-export default class LogTable extends FlipperDevicePlugin<
-  State,
-  Actions,
-  PersistedState,
-> {
+export default class LogTable extends FlipperDevicePlugin <State, Actions,PersistedState,> {
   static keyboardActions = ['clear', 'goToBottom', 'createPaste'];
 
   initTimer: ?TimeoutID;
@@ -447,6 +445,8 @@ export default class LogTable extends FlipperDevicePlugin<
         this.scheudleEntryForBatch(processedEntry);
       }
     });
+
+    this.state.additionalData = ["key1","key2"]
   }
 
   incrementCounterIfNeeded = (entry: DeviceLogEntry) => {
@@ -554,17 +554,21 @@ export default class LogTable extends FlipperDevicePlugin<
       ...this.state,
       highlightedRows: new Set(highlightedRows),
     });
+    this.state.additionalData = ["key1","key2"]
+    console.log('...running onRowHighlighted')
   };
 
   renderSidebar = () => {
+    console.log(this.state.additionalData)
     return (
       <LogWatcher
+        additionalData={this.state.additionalData}
         counters={this.state.counters}
-        onChange={counters =>
-          this.setState({counters}, () =>
+        onChange={additionalData =>
+          this.setState({additionalData}, () =>
             window.localStorage.setItem(
               LOG_WATCHER_LOCAL_STORAGE_KEY,
-              JSON.stringify(this.state.counters),
+              JSON.stringify(this.state.additionalData),
             ),
           )
         }
@@ -591,7 +595,7 @@ export default class LogTable extends FlipperDevicePlugin<
       <LogTable.ContextMenu
         buildItems={this.buildContextMenuItems}
         component={FlexColumn}>
-        <SearchableTable
+        <ManagedTable
           innerRef={this.setTableRef}
           floating={false}
           multiline={true}

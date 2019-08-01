@@ -38,22 +38,17 @@ type State = {
 };
 
 const ColumnSizes = {
-  expression: '70%',
-  count: '15%',
-  notify: 'flex',
+  key: '30%',
+  value: 'flex',
 };
 
 const Columns = {
   expression: {
-    value: 'Expression',
+    value: 'Key',
     resizable: false,
   },
   count: {
-    value: 'Count',
-    resizable: false,
-  },
-  notify: {
-    value: 'Notify',
+    value: 'Value',
     resizable: false,
   },
 };
@@ -195,19 +190,6 @@ export default class LogWatcher extends PureComponent<Props, State> {
           heading="Hit Details"
           floating={false}
           padded={false}>
-          <Toolbar>
-            <ExpressionInput
-              value={this.state.input}
-              placeholder="Expression..."
-              onChange={this.onChange}
-              onKeyDown={this.onSubmit}
-            />
-            <Button
-              onClick={this.onAdd}
-              disabled={this.state.input.length === 0}>
-              Add counter
-            </Button>
-          </Toolbar>
           <ManagedTable
             onRowHighlighted={this.onRowHighlighted}
             columnSizes={ColumnSizes}
@@ -222,19 +204,6 @@ export default class LogWatcher extends PureComponent<Props, State> {
           heading="Additional Data"
           floating={false}
           padded={false}>
-          <Toolbar>
-            <ExpressionInput
-              value={this.state.input}
-              placeholder="Expression..."
-              onChange={this.onChange}
-              onKeyDown={this.onSubmit}
-            />
-            <Button
-              onClick={this.onAdd}
-              disabled={this.state.input.length === 0}>
-              Add counter
-            </Button>
-          </Toolbar>
           <ManagedTable
             onRowHighlighted={this.onRowHighlighted}
             columnSizes={ColumnSizes}
@@ -249,19 +218,6 @@ export default class LogWatcher extends PureComponent<Props, State> {
           heading="Context Data"
           floating={false}
           padded={false}>
-          <Toolbar>
-            <ExpressionInput
-              value={this.state.input}
-              placeholder="Expression..."
-              onChange={this.onChange}
-              onKeyDown={this.onSubmit}
-            />
-            <Button
-              onClick={this.onAdd}
-              disabled={this.state.input.length === 0}>
-              Add counter
-            </Button>
-          </Toolbar>
           <ManagedTable
             onRowHighlighted={this.onRowHighlighted}
             columnSizes={ColumnSizes}
@@ -269,7 +225,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             rows={this.buildRows()}
             autoHeight={true}
             floating={false}
-            zebra={true}
+            zebra={false}
           />
         </WatcherPanel>
       </FlexColumn>

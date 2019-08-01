@@ -86,7 +86,7 @@ const COLUMN_SIZE = {
   //tid: 60,
   //tag: 120,
   //app: 200,
-  message: 300,
+  message: 'flex',
 };
 
 const COLUMNS = {
@@ -94,7 +94,7 @@ const COLUMNS = {
     value: 'Time',
   },
   message: {
-    value: 'Message',
+    value: 'Hit',
   },
 };
 
@@ -603,7 +603,7 @@ export default class LogTable extends FlipperDevicePlugin<
           onRowHighlighted={this.onRowHighlighted}
           multiHighlight={true}
           defaultFilters={DEFAULT_FILTERS}
-          zebra={false}
+          zebra={true}
           actions={<Button onClick={this.clearLogs}>Clear Logs</Button>}
           allowRegexSearch={true}
           // If the logs is opened through deeplink, then don't scroll as the row is highlighted

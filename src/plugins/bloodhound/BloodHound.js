@@ -46,8 +46,8 @@ type State = {
 };
 
 const ColumnSizes = {
-  key: '30%',
-  value: 'flex',
+  keyColumn: '30%',
+  valueColum: 'flex',
 };
 
 const Columns = {
@@ -213,25 +213,18 @@ export default class LogWatcher extends PureComponent<Props, State> {
 
   buildRowsContextData = (): Array<TableBodyRow> => {
     console.log("...running buildRowsContextData")
-    const rows = this.props.counters.map(({label, count, notify}, i) => ({
+    console.log(this.props)
+    console.log(this.props.contextData)
+    const rows = this.props.contextData.map(({name, value}, i) => ({
       columns: {
         keyColumn: {
-          value: <Text code={true}>{label}</Text>,
+          value: <Text code={true}>{name}</Text>,
         },
-        count: {
-          value: <Count onClick={() => this.resetCount(i)}>{count}</Count>,
-        },
-        notify: {
-          value: (
-            <Checkbox
-              type="checkbox"
-              checked={notify}
-              onChange={() => this.setNotification(i, !notify)}
-            />
-          ),
+        valueColumn: {
+          value: <Text code={true}>{value}</Text>,
         },
       },
-      key: label,
+      key: name,
     }));
     console.log(rows)
     return rows
@@ -308,7 +301,6 @@ export default class LogWatcher extends PureComponent<Props, State> {
           floating={false}
           padded={false}>
           <ManagedTable
-            onRowHighlighted={this.onRowHighlighted}
             columnSizes={ColumnSizes}
             columns={Columns}
             rows={this.buildRowsContextData()}

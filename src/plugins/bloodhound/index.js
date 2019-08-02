@@ -47,7 +47,8 @@ type State = {|
   key2entry: {[key: string]: DeviceLogEntry},
   highlightedRows: Set<string>,
   counters: Array<Counter>,
-  additionalData: Array<NameValuePair>
+  additionalData: Array<NameValuePair>,
+  contextData: Array<NameValuePair>
 |};
 
 type Actions = {||};
@@ -283,25 +284,14 @@ export function addRowIfNeeded(
 
 function getPageName(textString: string): string {
   var trimmedString = trimStartEndChars(textString)
-
   var decodedTrimmedString = decodeURIComponent(trimmedString);
-
   var params = decodedTrimmedString.split("&");
-  console.log('params:')
-  console.log(params)
-
   let found = params.find(element => element.includes("pageName"));
-
   if (typeof(found) == "undefined") {
     return "* pageName not found"
   }
-  console.log(found)
-
   let param = found.split("=")
-  console.log(param)
-
   let paramValue = param[1];
-
   return paramValue;
 }
 
@@ -374,8 +364,6 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
     entry
   };
 }
-
-
 
 export default class LogTable extends FlipperDevicePlugin <State, Actions,PersistedState,> {
   static keyboardActions = ['clear', 'goToBottom', 'createPaste'];
@@ -480,6 +468,8 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         initialState.rows,
       ),
       counters: this.restoreSavedCounters(),
+      contextData: [],
+      additionalData: []
     };
 
     this.logListener = this.device.addLogListener((entry: DeviceLogEntry) => {
@@ -611,19 +601,44 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     this.state.counters[0] = newCounter
     this.setState({counters});
 
+    // assign context data
+    let contextData = this.state.contextData
+
+    while (contextData.length) {
+        contextData.pop();
+    }
+
+    const newContextDataElement = {
+      name: 'nameField',
+      value: 'valueField'
+    }
+
+    this.state.contextData.push(newContextDataElement)
+
+    this.setState({contextData});
+
+    console.log(this.state.contextData)
+
     console.log('...running onRowHighlighted - end')
   };
 
   renderSidebar = () => {
+    console.log("...running renderSidebar")
+    /*
+    console.log(this.state.counters)
+    console.log(this.state.additionalData)
+    console.log(this.state.contextData)
+    */
     return (
       <LogWatcher
         additionalData={this.state.additionalData}
+        contextData={this.state.contextData}
         counters={this.state.counters}
-        onChange={additionalData =>
-          this.setState({additionalData}, () =>
+        onChange={contextData =>
+          this.setState({contextData}, () =>
             window.localStorage.setItem(
               LOG_WATCHER_LOCAL_STORAGE_KEY,
-              JSON.stringify(this.state.additionalData),
+              JSON.stringify(this.state.contextData),
             ),
           )
         }

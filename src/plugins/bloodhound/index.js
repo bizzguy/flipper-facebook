@@ -83,7 +83,8 @@ function keepKeys(obj, keys) {
 
 const COLUMN_SIZE = {
   time: 120,
-  hitColumn: 240
+  hitColumn: 240,
+  message: 'flex'
 };
 
 const COLUMNS = {
@@ -92,6 +93,9 @@ const COLUMNS = {
   },
   hitColumn: {
     value: 'Hit'
+  },
+  message: {
+    value: 'Message'
   },
 };
 
@@ -103,7 +107,11 @@ const INITIAL_COLUMN_ORDER = [
   {
     key: 'time',
     visible: true,
-  }
+  },
+  {
+    key: 'message',
+    visible: true,
+  },
 ];
 
 const LOG_TYPES: {
@@ -273,9 +281,43 @@ export function addRowIfNeeded(
   }
 }
 
+function getPageName(textString: string): string {
+  var trimmedString = trimStartEndChars(textString)
+
+  var decodedTrimmedString = decodeURIComponent(trimmedString);
+
+  var params = decodedTrimmedString.split("&");
+  console.log('params:')
+  console.log(params)
+
+  let found = params.find(element => element.includes("pageName"));
+
+  if (typeof(found) == "undefined") {
+    return "* pageName not found"
+  }
+  console.log(found)
+
+  let param = found.split("=")
+  console.log(param)
+
+  let paramValue = param[1];
+
+  return paramValue;
+}
+
+function trimStartEndChars(textString: string): string {
+  var trimmedString = textString.replace('ADBMobile Debug : Analytics - Request Queued (','');
+  trimmedString = trimmedString.substr(0, trimmedString.length - 1);
+  return trimmedString;
+}
+
 export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBodyRow, entry: DeviceLogEntry} {
   const {icon, style} = LOG_TYPES[(entry.type: string)] || LOG_TYPES.debug;
   // build the item, it will either be batched or added straight away
+
+  // calculate hit value
+  const hitValue = getPageName(entry.message)
+
   return {
     row: {
       columns: {
@@ -294,15 +336,12 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
         },
         message: {
           value: (
-            <HiddenScrollText code={true}>*** place holder text for message1 ***</HiddenScrollText>
+            <HiddenScrollText code={true}>{entry.message}</HiddenScrollText>
           ),
-        },
-        message2: {
-          value: <HiddenScrollText code={true}>*** place holder text for message2 ***</HiddenScrollText>
         },
         hitColumn: {
           value: (
-            <HiddenScrollText code={true}>*** place holder text for hit ***</HiddenScrollText>
+            <HiddenScrollText code={true}>{hitValue}</HiddenScrollText>
           ),
         },
         tag: {
@@ -335,6 +374,8 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
     entry
   };
 }
+
+
 
 export default class LogTable extends FlipperDevicePlugin <State, Actions,PersistedState,> {
   static keyboardActions = ['clear', 'goToBottom', 'createPaste'];

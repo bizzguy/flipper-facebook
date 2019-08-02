@@ -35,7 +35,9 @@ export type NameValuePair = {
 type Props = {|
   onChange: (counters: Array<Counter>) => void,
   counters: Array<Counter>,
-  additionalData: Array<string>
+  additionalData: Array<NameValuePair>,
+  contextData: Array<NameValuePair>,
+  hitDetails: Array<NameValuePair>
 |};
 
 type State = {
@@ -85,7 +87,7 @@ const ExpressionInput = styled(Input)({
 });
 
 const WatcherPanel = styled(Panel)({
-  minHeight: 200,
+  minHeight: 100,
 });
 
 export default class LogWatcher extends PureComponent<Props, State> {
@@ -157,6 +159,32 @@ export default class LogWatcher extends PureComponent<Props, State> {
     }));
   };
 
+  buildRowsHitDetails = (): Array<TableBodyRow> => {
+    console.log("...running buildRowsHitDetails")
+    const rows = this.props.counters.map(({label, count, notify}, i) => ({
+      columns: {
+        keyColumn: {
+          value: <Text code={true}>{label}</Text>,
+        },
+        count: {
+          value: <Count onClick={() => this.resetCount(i)}>{count}</Count>,
+        },
+        notify: {
+          value: (
+            <Checkbox
+              type="checkbox"
+              checked={notify}
+              onChange={() => this.setNotification(i, !notify)}
+            />
+          ),
+        },
+      },
+      key: label,
+    }));
+    console.log(rows)
+    return rows
+  };
+
   buildRowsAdditionalData = (): Array<TableBodyRow> => {
     console.log("...running buildRowsAdditionalData")
     const rows = this.props.counters.map(({label, count, notify}, i) => ({
@@ -209,7 +237,6 @@ export default class LogWatcher extends PureComponent<Props, State> {
     return rows
   };
 
-
   setNotification = (index: number, notify: boolean) => {
     const newCounters: Array<Counter> = [...this.props.counters];
     newCounters[index] = {
@@ -256,7 +283,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             onRowHighlighted={this.onRowHighlighted}
             columnSizes={ColumnSizes}
             columns={Columns}
-            rows={this.buildRows()}
+            rows={this.buildRowsHitDetails()}
             autoHeight={true}
             floating={false}
             zebra={false}

@@ -82,33 +82,28 @@ function keepKeys(obj, keys) {
 }
 
 const COLUMN_SIZE = {
-  //type: 40,
   time: 120,
-  //pid: 60,
-  //tid: 60,
-  //tag: 120,
-  //app: 200,
-  message: 'flex',
+  hitColumn: 240
 };
 
 const COLUMNS = {
   time: {
-    value: 'Time',
+    value: 'Time'
   },
-  message: {
-    value: 'Hit',
+  hitColumn: {
+    value: 'Hit'
   },
 };
 
 const INITIAL_COLUMN_ORDER = [
   {
-    key: 'time',
+    key: 'hitColumn',
     visible: true,
   },
   {
-    key: 'message',
+    key: 'time',
     visible: true,
-  },
+  }
 ];
 
 const LOG_TYPES: {
@@ -278,17 +273,10 @@ export function addRowIfNeeded(
   }
 }
 
-export function processEntry(
-  entry: DeviceLogEntry,
-  key: string,
-): {
-  row: TableBodyRow,
-  entry: DeviceLogEntry,
-} {
+export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBodyRow, entry: DeviceLogEntry} {
   const {icon, style} = LOG_TYPES[(entry.type: string)] || LOG_TYPES.debug;
   // build the item, it will either be batched or added straight away
   return {
-    entry,
     row: {
       columns: {
         type: {
@@ -306,7 +294,15 @@ export function processEntry(
         },
         message: {
           value: (
-            <HiddenScrollText code={true}>{entry.message}</HiddenScrollText>
+            <HiddenScrollText code={true}>*** place holder text for message1 ***</HiddenScrollText>
+          ),
+        },
+        message2: {
+          value: <HiddenScrollText code={true}>*** place holder text for message2 ***</HiddenScrollText>
+        },
+        hitColumn: {
+          value: (
+            <HiddenScrollText code={true}>*** place holder text for hit ***</HiddenScrollText>
           ),
         },
         tag: {
@@ -336,6 +332,7 @@ export function processEntry(
       filterValue: entry.message,
       key,
     },
+    entry
   };
 }
 
@@ -416,12 +413,18 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
 
   constructor(props: PluginProps<PersistedState>) {
     super(props);
+
     const supportedColumns = this.device.supportedColumns();
+
     this.columns = keepKeys(COLUMNS, supportedColumns);
     this.columnSizes = keepKeys(COLUMN_SIZE, supportedColumns);
     this.columnOrder = INITIAL_COLUMN_ORDER.filter(obj =>
       supportedColumns.includes(obj.key),
     );
+
+    this.columns = COLUMNS
+    this.columnSizes = COLUMN_SIZE
+    this.columnOrder = INITIAL_COLUMN_ORDER
 
     const initialState = addEntriesToState(
       this.device
@@ -445,8 +448,6 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         this.scheudleEntryForBatch(processedEntry);
       }
     });
-
-    this.state.additionalData = ["key1","key2"]
   }
 
   incrementCounterIfNeeded = (entry: DeviceLogEntry) => {
@@ -555,11 +556,8 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       ...this.state,
       highlightedRows: new Set(highlightedRows),
     });
-    console.log("highlightedRows")
     const currentEntry = this.state.entries[highlightedRows[0]].entry
     const time = currentEntry.date.toTimeString().split(' ')[0] + '.' + pad(currentEntry.date.getMilliseconds(), 3)
-    console.log(time)
-    this.state.additionalData = ["key1","key2"]
 
     const newCounter = {
       label: time,
@@ -567,23 +565,15 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       notify: false,
       count: 0,
     }
-    console.log(newCounter)
 
     const counters = this.state.counters
-
-    console.log('before push')
     this.state.counters[0] = newCounter
-    console.log('after push')
-    console.log(counters)
-    console.log(this.state.counters)
     this.setState({counters});
 
-    console.log(this.state.counters)
     console.log('...running onRowHighlighted - end')
   };
 
   renderSidebar = () => {
-    console.log(this.state.additionalData)
     return (
       <LogWatcher
         additionalData={this.state.additionalData}

@@ -49,13 +49,13 @@ const ColumnSizes = {
 };
 
 const Columns = {
-  key: {
+  keyColumn: {
     value: 'Key',
-    resizable: false,
+    resizable: true,
   },
-  value: {
+  valueColumn: {
     value: 'Value',
-    resizable: false,
+    resizable: true,
   },
 };
 
@@ -95,6 +95,8 @@ export default class LogWatcher extends PureComponent<Props, State> {
   };
 
   _inputRef: ?HTMLInputElement;
+
+  rowCounter = 0;
 
   onAdd = () => {
     if (
@@ -159,9 +161,34 @@ export default class LogWatcher extends PureComponent<Props, State> {
 
   buildRowsAdditionalData = (): Array<TableBodyRow> => {
     console.log("...running buildRowsAdditionalData")
-    return this.props.counters.map(({label, count, notify}, i) => ({
+    return {
       columns: {
-        expression: {
+        keyColumn: {
+          value: <Text>key1</Text>,
+        },
+        valueColumn: {
+          value: <Text>value1</Text>,
+        }
+      },
+      key: "key1",
+    }
+  };
+
+  buildRowsContextData = (): Array<TableBodyRow> => {
+    console.log("...running buildRowsContextData")
+    this.rowCounter++
+    const newCounter = {
+      label: this.rowCounter,
+      expression: new RegExp(this.state.input, 'gi'),
+      notify: false,
+      count: 0,
+    }
+    console.log(newCounter)
+    this.props.counters.push(newCounter)
+    console.log(this.props.counters)
+    const rows = this.props.counters.map(({label, count, notify}, i) => ({
+      columns: {
+        keyColumn: {
           value: <Text code={true}>{label}</Text>,
         },
         count: {
@@ -179,7 +206,10 @@ export default class LogWatcher extends PureComponent<Props, State> {
       },
       key: label,
     }));
+    console.log(rows)
+    return rows
   };
+
 
   setNotification = (index: number, notify: boolean) => {
     const newCounters: Array<Counter> = [...this.props.counters];
@@ -254,7 +284,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             onRowHighlighted={this.onRowHighlighted}
             columnSizes={ColumnSizes}
             columns={Columns}
-            rows={this.buildRows()}
+            rows={this.buildRowsContextData()}
             autoHeight={true}
             floating={false}
             zebra={false}

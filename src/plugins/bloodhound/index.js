@@ -47,7 +47,7 @@ type State = {|
   key2entry: {[key: string]: DeviceLogEntry},
   highlightedRows: Set<string>,
   counters: Array<Counter>,
-  additionalData: Array<string>
+  additionalData: Array<NameValuePair>
 |};
 
 type Actions = {||};
@@ -554,7 +554,12 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       ...this.state,
       highlightedRows: new Set(highlightedRows),
     });
+    console.log("highlightedRows")
+    const currentEntry = this.state.entries[highlightedRows[0]].entry
+    console.log(currentEntry.date.toTimeString().split(' ')[0] + '.' + pad(currentEntry.date.getMilliseconds(), 3))
     this.state.additionalData = ["key1","key2"]
+    const counters = []
+    this.setState({counters});
     console.log('...running onRowHighlighted')
   };
 
@@ -605,11 +610,10 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
           rows={this.state.rows}
           highlightedRows={this.state.highlightedRows}
           onRowHighlighted={this.onRowHighlighted}
-          multiHighlight={true}
-          defaultFilters={DEFAULT_FILTERS}
+          multiHighlight={false}
           zebra={true}
           actions={<Button onClick={this.clearLogs}>Clear Logs</Button>}
-          allowRegexSearch={true}
+          allowRegexSearch={false}
           // If the logs is opened through deeplink, then don't scroll as the row is highlighted
           stickyBottom={
             !(this.props.deepLinkPayload && this.state.highlightedRows.size > 0)

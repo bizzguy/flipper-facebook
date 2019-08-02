@@ -160,18 +160,39 @@ export default class LogWatcher extends PureComponent<Props, State> {
   };
 
   buildRowsAdditionalData = (): Array<TableBodyRow> => {
-    console.log("...running buildRowsAdditionalData")
-    return {
+    console.log("...running buildRowsContextData")
+    this.rowCounter++
+    const newCounter = {
+      label: this.rowCounter,
+      expression: new RegExp(this.state.input, 'gi'),
+      notify: false,
+      count: 0,
+    }
+    console.log(newCounter)
+    this.props.counters.push(newCounter)
+    console.log(this.props.counters)
+    const rows = this.props.counters.map(({label, count, notify}, i) => ({
       columns: {
         keyColumn: {
-          value: <Text>key1</Text>,
+          value: <Text code={true}>{label}</Text>,
         },
-        valueColumn: {
-          value: <Text>value1</Text>,
-        }
+        count: {
+          value: <Count onClick={() => this.resetCount(i)}>{count}</Count>,
+        },
+        notify: {
+          value: (
+            <Checkbox
+              type="checkbox"
+              checked={notify}
+              onChange={() => this.setNotification(i, !notify)}
+            />
+          ),
+        },
       },
-      key: "key1",
-    }
+      key: label,
+    }));
+    console.log(rows)
+    return rows
   };
 
   buildRowsContextData = (): Array<TableBodyRow> => {
@@ -250,6 +271,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
       <FlexColumn grow={true} tabIndex={-1} onKeyDown={this.onKeyDown}>
         <WatcherPanel
           heading="Hit Details"
+          grow={false}
           floating={false}
           padded={false}>
           <ManagedTable
@@ -270,7 +292,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             onRowHighlighted={this.onRowHighlighted}
             columnSizes={ColumnSizes}
             columns={Columns}
-            rows={this.buildRows()}
+            rows={this.buildRowsAdditionalData()}
             autoHeight={true}
             floating={false}
             zebra={false}

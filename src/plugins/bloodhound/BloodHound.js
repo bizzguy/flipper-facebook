@@ -96,8 +96,6 @@ export default class LogWatcher extends PureComponent<Props, State> {
 
   _inputRef: ?HTMLInputElement;
 
-  rowCounter = 0;
-
   onAdd = () => {
     if (
       this.props.counters.findIndex(({label}) => label === this.state.input) >
@@ -160,17 +158,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
   };
 
   buildRowsAdditionalData = (): Array<TableBodyRow> => {
-    console.log("...running buildRowsContextData")
-    this.rowCounter++
-    const newCounter = {
-      label: this.rowCounter,
-      expression: new RegExp(this.state.input, 'gi'),
-      notify: false,
-      count: 0,
-    }
-    console.log(newCounter)
-    this.props.counters.push(newCounter)
-    console.log(this.props.counters)
+    console.log("...running buildRowsAdditionalData")
     const rows = this.props.counters.map(({label, count, notify}, i) => ({
       columns: {
         keyColumn: {
@@ -197,16 +185,6 @@ export default class LogWatcher extends PureComponent<Props, State> {
 
   buildRowsContextData = (): Array<TableBodyRow> => {
     console.log("...running buildRowsContextData")
-    this.rowCounter++
-    const newCounter = {
-      label: this.rowCounter,
-      expression: new RegExp(this.state.input, 'gi'),
-      notify: false,
-      count: 0,
-    }
-    console.log(newCounter)
-    this.props.counters.push(newCounter)
-    console.log(this.props.counters)
     const rows = this.props.counters.map(({label, count, notify}, i) => ({
       columns: {
         keyColumn: {

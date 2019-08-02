@@ -550,17 +550,36 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
   };
 
   onRowHighlighted = (highlightedRows: Array<string>) => {
+    console.log('...running onRowHighlighted - begin')
     this.setState({
       ...this.state,
       highlightedRows: new Set(highlightedRows),
     });
     console.log("highlightedRows")
     const currentEntry = this.state.entries[highlightedRows[0]].entry
-    console.log(currentEntry.date.toTimeString().split(' ')[0] + '.' + pad(currentEntry.date.getMilliseconds(), 3))
+    const time = currentEntry.date.toTimeString().split(' ')[0] + '.' + pad(currentEntry.date.getMilliseconds(), 3)
+    console.log(time)
     this.state.additionalData = ["key1","key2"]
-    const counters = []
+
+    const newCounter = {
+      label: time,
+      expression: new RegExp(this.state.input, 'gi'),
+      notify: false,
+      count: 0,
+    }
+    console.log(newCounter)
+
+    const counters = this.state.counters
+
+    console.log('before push')
+    this.state.counters[0] = newCounter
+    console.log('after push')
+    console.log(counters)
+    console.log(this.state.counters)
     this.setState({counters});
-    console.log('...running onRowHighlighted')
+
+    console.log(this.state.counters)
+    console.log('...running onRowHighlighted - end')
   };
 
   renderSidebar = () => {

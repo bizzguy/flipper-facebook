@@ -85,7 +85,7 @@ function keepKeys(obj, keys) {
 const COLUMN_SIZE = {
   time: 120,
   hitColumn: 240,
-  message: 'flex'
+  message: 10
 };
 
 const COLUMNS = {
@@ -299,6 +299,57 @@ function trimStartEndChars(textString: string): string {
   var trimmedString = textString.replace('ADBMobile Debug : Analytics - Request Queued (','');
   trimmedString = trimmedString.substr(0, trimmedString.length - 1);
   return trimmedString;
+}
+
+function getContextData(textString: string): Array<string> {
+  console.log("...running getContextData")
+  var trimmedString = trimStartEndChars(textString)
+  var decodedTrimmedString = decodeURIComponent(trimmedString);
+  var params = decodedTrimmedString.split("&");
+
+  console.log(params)
+
+  let newParams = []
+
+  let inC = false
+  let inA = false
+
+  for (const param of params){
+    if (param == "c.") {
+      inC = true
+      continue
+    }
+    if (param == "a.") {
+      inA = true
+      continue
+    }
+    if (param == ".c") {
+      inC = false
+      continue
+    }
+    if (param == ".a") {
+      inA = false
+      continue
+    }
+
+    if (inA) {
+        let newParam = 'a.' + param
+        newParams.push(newParam)
+        continue
+    }
+
+    if (inC) {
+        newParams.push(param)
+        continue
+    }
+
+  }
+
+  newParams.sort()
+
+  console.log(newParams)
+
+  return newParams;
 }
 
 export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBodyRow, entry: DeviceLogEntry} {
@@ -608,12 +659,20 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         contextData.pop();
     }
 
-    const newContextDataElement = {
-      name: 'nameField',
-      value: 'valueField'
-    }
+    let message = currentEntry.message
 
-    this.state.contextData.push(newContextDataElement)
+    let newContextData = getContextData(message)
+
+    console.log('newContextData')
+    console.log(newContextData)
+
+    for (const newContextDataElement of newContextData){
+      console.log(newContextDataElement)
+      let paramName = String(newContextDataElement)
+      console.log(paramName)
+      let param = paramName.split("=")
+      this.state.contextData.push({name: param[0] , value: param[1] })
+    }
 
     this.setState({contextData});
 

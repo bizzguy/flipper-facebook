@@ -769,7 +769,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       <LogTable.ContextMenu
         buildItems={this.buildContextMenuItems}
         component={FlexColumn}>
-        <ManagedTable
+        <SearchableTable
           innerRef={this.setTableRef}
           floating={false}
           multiline={true}

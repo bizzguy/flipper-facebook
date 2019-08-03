@@ -187,25 +187,18 @@ export default class LogWatcher extends PureComponent<Props, State> {
 
   buildRowsAdditionalData = (): Array<TableBodyRow> => {
     console.log("...running buildRowsAdditionalData")
-    const rows = this.props.counters.map(({label, count, notify}, i) => ({
+    console.log(this.props)
+    console.log(this.props.additionalData)
+    const rows = this.props.additionalData.map(({name, value}, i) => ({
       columns: {
         keyColumn: {
-          value: <Text code={true}>{label}</Text>,
+          value: <Text code={true}>{name}</Text>,
         },
-        count: {
-          value: <Count onClick={() => this.resetCount(i)}>{count}</Count>,
-        },
-        notify: {
-          value: (
-            <Checkbox
-              type="checkbox"
-              checked={notify}
-              onChange={() => this.setNotification(i, !notify)}
-            />
-          ),
+        valueColumn: {
+          value: <Text code={true}>{value}</Text>,
         },
       },
-      key: label,
+      key: name,
     }));
     console.log(rows)
     return rows

@@ -337,18 +337,47 @@ function getContextData(textString: string): Array<string> {
         newParams.push(newParam)
         continue
     }
-
     if (inC) {
         newParams.push(param)
         continue
     }
-
   }
 
   newParams.sort()
-
   console.log(newParams)
+  return newParams;
+}
 
+function getAdditionalData(textString: string): Array<string> {
+  console.log("...running getAdditionalData")
+  var trimmedString = trimStartEndChars(textString)
+  var decodedTrimmedString = decodeURIComponent(trimmedString);
+  var params = decodedTrimmedString.split("&");
+
+  console.log(params)
+
+  let newParams = []
+
+  let inC = false
+
+  for (const param of params){
+    if (param == "c.") {
+      inC = true
+      continue
+    }
+    if (param == ".c") {
+      inC = false
+      continue
+    }
+
+    if (!inC) {
+        newParams.push(param)
+        continue
+    }
+  }
+
+  newParams.sort()
+  console.log(newParams)
   return newParams;
 }
 
@@ -662,10 +691,8 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     let message = currentEntry.message
 
     let newContextData = getContextData(message)
-
     console.log('newContextData')
     console.log(newContextData)
-
     for (const newContextDataElement of newContextData){
       console.log(newContextDataElement)
       let paramName = String(newContextDataElement)
@@ -673,10 +700,28 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       let param = paramName.split("=")
       this.state.contextData.push({name: param[0] , value: param[1] })
     }
-
     this.setState({contextData});
-
     console.log(this.state.contextData)
+
+    // assign additional data
+    let additionalData = this.state.additionalData
+
+    while (additionalData.length) {
+        additionalData.pop();
+    }
+
+    let newAdditionalData = getAdditionalData(message)
+    console.log('newAdditionalData')
+    console.log(newAdditionalData)
+    for (const newAdditionalDataElement of newAdditionalData){
+      console.log(newAdditionalDataElement)
+      let paramName = String(newAdditionalDataElement)
+      console.log(paramName)
+      let param = paramName.split("=")
+      this.state.additionalData.push({name: param[0] , value: param[1] })
+    }
+    this.setState({additionalData});
+    console.log(this.state.additionalData)
 
     console.log('...running onRowHighlighted - end')
   };

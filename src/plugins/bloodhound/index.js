@@ -48,7 +48,8 @@ type State = {|
   highlightedRows: Set<string>,
   counters: Array<Counter>,
   additionalData: Array<NameValuePair>,
-  contextData: Array<NameValuePair>
+  contextData: Array<NameValuePair>,
+  hitData: Array<NameValuePair>
 |};
 
 type Actions = {||};
@@ -83,21 +84,17 @@ function keepKeys(obj, keys) {
 }
 
 const COLUMN_SIZE = {
-  time: 120,
-  hitColumn: 240,
-  message: 10
+  hitColumn: 270,
+  time: 115
 };
 
 const COLUMNS = {
-  time: {
-    value: 'Time'
-  },
   hitColumn: {
     value: 'Hit'
   },
-  message: {
-    value: 'Message'
-  },
+  time: {
+    value: 'Time'
+  }
 };
 
 const INITIAL_COLUMN_ORDER = [
@@ -108,11 +105,7 @@ const INITIAL_COLUMN_ORDER = [
   {
     key: 'time',
     visible: true,
-  },
-  {
-    key: 'message',
-    visible: true,
-  },
+  }
 ];
 
 const LOG_TYPES: {
@@ -549,7 +542,8 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       ),
       counters: this.restoreSavedCounters(),
       contextData: [],
-      additionalData: []
+      additionalData: [],
+      hitData: []
     };
 
     this.logListener = this.device.addLogListener((entry: DeviceLogEntry) => {
@@ -723,6 +717,10 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     this.setState({additionalData});
     console.log(this.state.additionalData)
 
+    // assign hit data
+    let hitData = this.state.additionalData
+    this.setState({hitData})
+
     console.log('...running onRowHighlighted - end')
   };
 
@@ -735,9 +733,10 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     */
     return (
       <LogWatcher
+        counters={this.state.counters}
         additionalData={this.state.additionalData}
         contextData={this.state.contextData}
-        counters={this.state.counters}
+        hitData={this.state.hitData}
         onChange={contextData =>
           this.setState({contextData}, () =>
             window.localStorage.setItem(
@@ -788,7 +787,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
             !(this.props.deepLinkPayload && this.state.highlightedRows.size > 0)
           }
         />
-        <DetailSidebar>{this.renderSidebar()}</DetailSidebar>
+        <DetailSidebar width={750}>{this.renderSidebar()}</DetailSidebar>
       </LogTable.ContextMenu>
     );
   }

@@ -37,12 +37,12 @@ type Props = {|
   counters: Array<Counter>,
   additionalData: Array<NameValuePair>,
   contextData: Array<NameValuePair>,
-  hitDetails: Array<NameValuePair>
+  hitData: Array<NameValuePair>
 |};
 
 type State = {
   input: string,
-  highlightedRow: ?string,
+  highlightedRow: ?string
 };
 
 const ColumnSizes = {
@@ -87,13 +87,13 @@ const ExpressionInput = styled(Input)({
 });
 
 const WatcherPanel = styled(Panel)({
-  minHeight: 100,
+  minHeight: 40,
 });
 
 export default class LogWatcher extends PureComponent<Props, State> {
   state = {
     input: '',
-    highlightedRow: null,
+    highlightedRow: null
   };
 
   _inputRef: ?HTMLInputElement;
@@ -159,14 +159,14 @@ export default class LogWatcher extends PureComponent<Props, State> {
     }));
   };
 
-  buildRowsHitDetails = (): Array<TableBodyRow> => {
-    console.log("...running buildRowsHitDetails")
+  buildRowsHitData = (): Array<TableBodyRow> => {
+    console.log("...running buildRowsHitData")
     console.log(this.props)
-    console.log(this.props.additionalData)
-    const rows = this.props.additionalData.map(({name, value}, i) => ({
+    console.log(this.props.hitData)
+    const rows = this.props.hitData.map(({name, value}, i) => ({
       columns: {
         keyColumn: {
-          value: <Text code={true}>{name}</Text>,
+          value: <Text code={true}>   {name}</Text>,
         },
         valueColumn: {
           value: <Text code={true}>{value}</Text>,
@@ -185,7 +185,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
     const rows = this.props.additionalData.map(({name, value}, i) => ({
       columns: {
         keyColumn: {
-          value: <Text code={true}>{name}</Text>,
+          value: <Text code={true}>   {name}</Text>,
         },
         valueColumn: {
           value: <Text code={true}>{value}</Text>,
@@ -204,7 +204,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
     const rows = this.props.contextData.map(({name, value}, i) => ({
       columns: {
         keyColumn: {
-          value: <Text code={true}>{name}</Text>,
+          value: <Text code={true}>   {name}</Text>,
         },
         valueColumn: {
           value: <Text code={true}>{value}</Text>,
@@ -258,13 +258,14 @@ export default class LogWatcher extends PureComponent<Props, State> {
           floating={false}
           padded={false}>
           <ManagedTable
-            onRowHighlighted={this.onRowHighlighted}
             columnSizes={ColumnSizes}
             columns={Columns}
             rows={this.buildRowsAdditionalData()}
             autoHeight={true}
             floating={false}
-            zebra={false}
+            zebra={true}
+            highlightableRows={true}
+            multiHighlight={false}
           />
         </WatcherPanel>
         <WatcherPanel
@@ -277,7 +278,25 @@ export default class LogWatcher extends PureComponent<Props, State> {
             rows={this.buildRowsContextData()}
             autoHeight={true}
             floating={false}
-            zebra={false}
+            zebra={true}
+            highlightableRows={true}
+            multiHighlight={false}
+          />
+        </WatcherPanel>
+        <WatcherPanel
+          collapsed={true}
+          heading="Hit Details and Diagnostic Data"
+          floating={false}
+          padded={false}>
+          <ManagedTable
+            columnSizes={ColumnSizes}
+            columns={Columns}
+            rows={this.buildRowsHitData()}
+            autoHeight={true}
+            floating={false}
+            zebra={true}
+            highlightableRows={true}
+            multiHighlight={false}
           />
         </WatcherPanel>
       </FlexColumn>

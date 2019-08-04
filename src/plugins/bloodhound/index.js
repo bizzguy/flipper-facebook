@@ -9,7 +9,7 @@ import type {
   TableBodyRow,
   TableColumnOrder,
   TableColumnSizes,
-  TableColumns,
+  TableColumns
 } from 'flipper';
 import type {Counter} from './BloodHound.js';
 import type {NameValuePair} from './BloodHound.js';
@@ -32,6 +32,7 @@ import {
   createPaste,
   textContent,
 } from 'flipper';
+
 import LogWatcher from './BloodHound';
 
 const LOG_WATCHER_LOCAL_STORAGE_KEY = 'LOG_WATCHER_LOCAL_STORAGE_KEY';
@@ -251,28 +252,8 @@ export function addRowIfNeeded(
   entry: DeviceLogEntry,
   previousEntry: ?DeviceLogEntry,
 ) {
-  const previousRow = rows.length > 0 ? rows[rows.length - 1] : null;
-  if (
-    previousRow &&
-    previousEntry &&
-    entry.message === previousEntry.message &&
-    entry.tag === previousEntry.tag &&
-    previousRow.type != null
-  ) {
-    // duplicate log, increase counter
-    const count =
-      previousRow.columns.type.value &&
-      previousRow.columns.type.value.props &&
-      typeof previousRow.columns.type.value.props.children === 'number'
-        ? previousRow.columns.type.value.props.children + 1
-        : 2;
-    const type = LOG_TYPES[previousRow.type] || LOG_TYPES.debug;
-    previousRow.columns.type.value = (
-      <LogCount backgroundColor={type.color}>{count}</LogCount>
-    );
-  } else {
-    rows.push(row);
-  }
+    rows.unshift(row);
+    console.log(rows)
 }
 
 function getPageName(textString: string): string {
@@ -342,13 +323,9 @@ function getContextData(textString: string): Array<string> {
 }
 
 function getAdditionalData(textString: string): Array<string> {
-  console.log("...running getAdditionalData")
   var trimmedString = trimStartEndChars(textString)
   var decodedTrimmedString = decodeURIComponent(trimmedString);
   var params = decodedTrimmedString.split("&");
-
-  console.log(params)
-
   let newParams = []
 
   let inC = false
@@ -368,9 +345,7 @@ function getAdditionalData(textString: string): Array<string> {
         continue
     }
   }
-
   newParams.sort()
-  console.log(newParams)
   return newParams;
 }
 
@@ -550,6 +525,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         .filter(log => log.message.match('ADBMobile Debug : Analytics - Request Queued'))
         .map(log => processEntry(log, String(this.counter++))),
     );
+
     this.state = {
       ...initialState,
       highlightedRows: this.calculateHighlightedRows(
@@ -806,7 +782,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
             !(this.props.deepLinkPayload && this.state.highlightedRows.size > 0)
           }
         />
-        <DetailSidebar width={750}>{this.renderSidebar()}</DetailSidebar>
+        <DetailSidebar width={500}>{this.renderSidebar()}</DetailSidebar>
       </LogTable.ContextMenu>
     );
   }

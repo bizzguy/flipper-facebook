@@ -160,9 +160,6 @@ export default class LogWatcher extends PureComponent<Props, State> {
   };
 
   buildRowsAdditionalData = (): Array<TableBodyRow> => {
-    console.log("...running buildRowsAdditionalData")
-    console.log(this.props)
-    console.log(this.props.additionalData)
     const rows = this.props.additionalData.map(({name, value}, i) => ({
       columns: {
         keyColumn: {
@@ -174,14 +171,10 @@ export default class LogWatcher extends PureComponent<Props, State> {
       },
       key: name,
     }));
-    console.log(rows)
     return rows
   };
 
   buildRowsContextData = (): Array<TableBodyRow> => {
-    console.log("...running buildRowsContextData")
-    console.log(this.props)
-    console.log(this.props.contextData)
     const rows = this.props.contextData.map(({name, value}, i) => ({
       columns: {
         keyColumn: {
@@ -193,14 +186,10 @@ export default class LogWatcher extends PureComponent<Props, State> {
       },
       key: name,
     }));
-    console.log(rows)
     return rows
   };
 
   buildRowsHitData = (): Array<TableBodyRow> => {
-    console.log("...running buildRowsHitData")
-    console.log(this.props)
-    console.log(this.props.hitData)
     const rows = this.props.hitData.map(({name, value}, i) => ({
       columns: {
         keyColumn: {
@@ -212,7 +201,6 @@ export default class LogWatcher extends PureComponent<Props, State> {
       },
       key: name,
     }));
-    console.log(rows)
     return rows
   };
 

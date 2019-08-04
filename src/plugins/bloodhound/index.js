@@ -374,6 +374,22 @@ function getAdditionalData(textString: string): Array<string> {
   return newParams;
 }
 
+function getHitData(textString: string, row): Array<NameValuePair> {
+  console.log("...running getHitData")
+
+  // assign additional data
+  let newHitData = []
+
+  newHitData.push({name: 'Time' , value: 'timeValue' })
+
+  console.log(row)
+  const unformattedTime = String(row.entry.date)
+  newHitData.push({name: 'Unformatted Date' , value: unformattedTime })
+
+  console.log(newHitData)
+  return newHitData;
+}
+
 export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBodyRow, entry: DeviceLogEntry} {
   const {icon, style} = LOG_TYPES[(entry.type: string)] || LOG_TYPES.debug;
   // build the item, it will either be batched or added straight away
@@ -661,7 +677,9 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       ...this.state,
       highlightedRows: new Set(highlightedRows),
     });
-    const currentEntry = this.state.entries[highlightedRows[0]].entry
+
+    const currentRow = this.state.entries[highlightedRows[0]]
+    const currentEntry = currentRow.entry
     const time = currentEntry.date.toTimeString().split(' ')[0] + '.' + pad(currentEntry.date.getMilliseconds(), 3)
 
     const newCounter = {
@@ -718,7 +736,8 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     console.log(this.state.additionalData)
 
     // assign hit data
-    let hitData = this.state.additionalData
+    console.log(currentRow)
+    let hitData = getHitData(message, currentRow)
     this.setState({hitData})
 
     console.log('...running onRowHighlighted - end')

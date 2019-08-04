@@ -47,7 +47,7 @@ type State = {
 
 const ColumnSizes = {
   keyColumn: '30%',
-  valueColum: 'flex',
+  valueColumn: 'flex',
 };
 
 const Columns = {
@@ -159,25 +159,6 @@ export default class LogWatcher extends PureComponent<Props, State> {
     }));
   };
 
-  buildRowsHitData = (): Array<TableBodyRow> => {
-    console.log("...running buildRowsHitData")
-    console.log(this.props)
-    console.log(this.props.hitData)
-    const rows = this.props.hitData.map(({name, value}, i) => ({
-      columns: {
-        keyColumn: {
-          value: <Text code={true}>   {name}</Text>,
-        },
-        valueColumn: {
-          value: <Text code={true}>{value}</Text>,
-        },
-      },
-      key: name,
-    }));
-    console.log(rows)
-    return rows
-  };
-
   buildRowsAdditionalData = (): Array<TableBodyRow> => {
     console.log("...running buildRowsAdditionalData")
     console.log(this.props)
@@ -208,6 +189,25 @@ export default class LogWatcher extends PureComponent<Props, State> {
         },
         valueColumn: {
           value: <Text code={true}>{value}</Text>,
+        },
+      },
+      key: name,
+    }));
+    console.log(rows)
+    return rows
+  };
+
+  buildRowsHitData = (): Array<TableBodyRow> => {
+    console.log("...running buildRowsHitData")
+    console.log(this.props)
+    console.log(this.props.hitData)
+    const rows = this.props.hitData.map(({name, value}, i) => ({
+      columns: {
+        keyColumn: {
+          value: <Text code={true}>   {name}</Text>,
+        },
+        valueColumn: {
+          value: <Text code={true}>{value}</Text>
         },
       },
       key: name,
@@ -266,6 +266,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             zebra={true}
             highlightableRows={true}
             multiHighlight={false}
+            multiline={true}
           />
         </WatcherPanel>
         <WatcherPanel
@@ -281,6 +282,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             zebra={true}
             highlightableRows={true}
             multiHighlight={false}
+            multiline={true}
           />
         </WatcherPanel>
         <WatcherPanel
@@ -297,6 +299,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             zebra={true}
             highlightableRows={true}
             multiHighlight={false}
+            multiline={true}
           />
         </WatcherPanel>
       </FlexColumn>

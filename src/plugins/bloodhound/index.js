@@ -355,14 +355,23 @@ function getHitData(textString: string, row): Array<NameValuePair> {
   // assign additional data
   let newHitData = []
 
-  newHitData.push({name: 'Time' , value: 'timeValue' })
+  const formattedDate = formatDate(row.entry.date)
 
-  console.log(row)
+  newHitData.push({name: 'Time' , value: formattedDate })
+
   const unformattedTime = String(row.entry.date)
   newHitData.push({name: 'Unformatted Date' , value: unformattedTime })
 
+  const message = String(row.entry.message)
+  newHitData.push({name: 'Message' , value: message })
+
   console.log(newHitData)
   return newHitData;
+}
+
+function formatDate(dateString: string): string {
+  var formattedDate = dateString.toTimeString().split(' ')[0] + '.' + pad(dateString.getMilliseconds(), 3)
+  return formattedDate;
 }
 
 export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBodyRow, entry: DeviceLogEntry} {
@@ -371,6 +380,8 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
 
   // calculate hit value
   const hitValue = getPageName(entry.message)
+
+  const formattedDate = formatDate(entry.date)
 
   return {
     row: {
@@ -381,11 +392,7 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
         },
         time: {
           value: (
-            <HiddenScrollText code={true}>
-              {entry.date.toTimeString().split(' ')[0] +
-                '.' +
-                pad(entry.date.getMilliseconds(), 3)}
-            </HiddenScrollText>
+            <HiddenScrollText code={true}>{formattedDate}</HiddenScrollText>
           ),
         },
         message: {
@@ -781,6 +788,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
           stickyBottom={
             !(this.props.deepLinkPayload && this.state.highlightedRows.size > 0)
           }
+          grow={true}
         />
         <DetailSidebar width={500}>{this.renderSidebar()}</DetailSidebar>
       </LogTable.ContextMenu>

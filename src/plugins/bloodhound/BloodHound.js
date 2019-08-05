@@ -285,7 +285,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             autoHeight={true}
             floating={false}
             zebra={true}
-            highlightableRows={true}
+            highlightableRows={false}
             multiHighlight={false}
             multiline={true}
           />

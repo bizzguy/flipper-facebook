@@ -117,31 +117,13 @@ const LOG_TYPES: {
     style?: Object,
   },
 } = {
-  verbose: {
-    label: 'Verbose',
-    color: colors.purple,
-  },
-  debug: {
-    label: 'Debug',
+  other: {
+    label: 'Other',
+    icon: <Icon name="info-circle" color={colors.cyan} />,
     color: colors.grey,
   },
-  info: {
-    label: 'Info',
-    icon: <Icon name="info-circle" color={colors.cyan} />,
-    color: colors.cyan,
-  },
-  warn: {
-    label: 'Warn',
-    style: {
-      backgroundColor: colors.yellowTint,
-      color: colors.yellow,
-      fontWeight: 500,
-    },
-    icon: <Icon name="caution-triangle" color={colors.yellow} />,
-    color: colors.yellow,
-  },
-  error: {
-    label: 'Error',
+  action: {
+    label: 'Action',
     style: {
       backgroundColor: colors.redTint,
       color: colors.red,
@@ -150,8 +132,8 @@ const LOG_TYPES: {
     icon: <Icon name="caution-octagon" color={colors.red} />,
     color: colors.red,
   },
-  fatal: {
-    label: 'Fatal',
+  lifecycle: {
+    label: 'Lifecycle',
     style: {
       backgroundColor: colors.redTint,
       color: colors.red,
@@ -257,6 +239,7 @@ export function addRowIfNeeded(
 }
 
 function getPageName(textString: string): string {
+  //const messageAnd = "ADBMobile Debug : Analytics - Request Queued (ndh=1&ce=UTF-8&c.&a.&CarrierName=Android&AppID=Foot%20Locker%203.8.0.debug%20%284007212%29&RunMode=Application&OSVersion=Android%208.1.0&TimeSinceLaunch=149500&Resolution=1440x2712&DeviceName=Android%20SDK%20built%20for%20x86&.a&logged_in=n&banner=mobileapp.footlocker.com&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20300&aamb=j8Odv6LonN4r3an7LhD3WZrU1bUpAkFkkiY1ncBR96t2PTI&mid=06473502235624536297363351139995300016&pageName=fl%3Am%3Alog_in&cp=foreground&aamlh=7)"
   var trimmedString = trimStartEndChars(textString)
   var decodedTrimmedString = decodeURIComponent(trimmedString);
   var params = decodedTrimmedString.split("&");
@@ -270,7 +253,11 @@ function getPageName(textString: string): string {
 }
 
 function trimStartEndChars(textString: string): string {
+  // Android Format
   var trimmedString = textString.replace('ADBMobile Debug : Analytics - Request Queued (','');
+  // iOS Format
+  trimmedString = trimmedString.replace('ADBMobile Debug: Analytics - Request Queued (','');
+
   trimmedString = trimmedString.substr(0, trimmedString.length - 1);
   return trimmedString;
 }
@@ -375,13 +362,23 @@ function formatDate(dateString: string): string {
 }
 
 export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBodyRow, entry: DeviceLogEntry} {
-  const {icon, style} = LOG_TYPES[(entry.type: string)] || LOG_TYPES.debug;
-  // build the item, it will either be batched or added straight away
+    // build the item, it will either be batched or added straight away
+
+  //const messageIos = "ADBMobile Debug: Analytics - Request Queued (ndh=1&t=00%2F00%2F0000%2000%3A00%3A00%200%20300&c.&banner=mobileapp.champssports.com&a.&OSVersion=iOS%2012.2&CarrierName=%28null%29&DeviceName=x86_64&AppID=ChampsDebug%203.8.0%20%285656%29&RunMode=Application&Resolution=828x1792&TimeSinceLaunch=325&.a&logged_in=n&.c&mid=72250179487144388442186498043366925718&pageName=cs%3Am%3Alog_in&ce=UTF-8&aamlh=9&cp=foreground&aamb=j8Odv6LonN4r3an7LhD3WZrU1bUpAkFkkiY1ncBR96t2PTI)"
+  //entry.message = messageIos
 
   // calculate hit value
   const hitValue = getPageName(entry.message)
 
   const formattedDate = formatDate(entry.date)
+
+  const entryType = "other"
+  const {icon, style} = LOG_TYPES[entryType]
+  if (entry.message)
+  console.log("style")
+  console.log(LOG_TYPES)
+  console.log(icon)
+  console.log(style)
 
   return {
     row: {
@@ -514,6 +511,9 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
   constructor(props: PluginProps<PersistedState>) {
     super(props);
 
+    console.log('device:')
+    console.log(this.device)
+
     const supportedColumns = this.device.supportedColumns();
 
     this.columns = keepKeys(COLUMNS, supportedColumns);
@@ -529,7 +529,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     const initialState = addEntriesToState(
       this.device
         .getLogs()
-        .filter(log => log.message.match('ADBMobile Debug : Analytics - Request Queued'))
+        .filter(log => log.message.match('Analytics - Request Queued'))
         .map(log => processEntry(log, String(this.counter++))),
     );
 
@@ -546,7 +546,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     };
 
     this.logListener = this.device.addLogListener((entry: DeviceLogEntry) => {
-      if (entry.message.match('ADBMobile Debug : Analytics - Request Queued')) {
+      if (entry.message.match('Analytics - Request Queued')) {
         const processedEntry = processEntry(entry, String(this.counter++));
         this.incrementCounterIfNeeded(processedEntry.entry);
         this.scheudleEntryForBatch(processedEntry);
@@ -771,6 +771,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         buildItems={this.buildContextMenuItems}
         component={FlexColumn}>
         <SearchableTable
+           width={500}
           innerRef={this.setTableRef}
           floating={false}
           multiline={true}
@@ -788,9 +789,8 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
           stickyBottom={
             !(this.props.deepLinkPayload && this.state.highlightedRows.size > 0)
           }
-          grow={true}
         />
-        <DetailSidebar width={500}>{this.renderSidebar()}</DetailSidebar>
+        <DetailSidebar width={550}>{this.renderSidebar()}</DetailSidebar>
       </LogTable.ContextMenu>
     );
   }

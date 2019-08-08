@@ -120,14 +120,14 @@ const LOG_TYPES: {
   other: {
     label: 'Other',
     icon: <Icon name="info-circle" color={colors.cyan} />,
-    color: colors.grey,
+    color: '#353334',
   },
   action: {
     label: 'Action',
     style: {
-      backgroundColor: colors.redTint,
-      color: colors.red,
-      fontWeight: 500,
+      backgroundColor: '#F8E6C9',
+      color: '#1F448E',
+      fontWeight: 600,
     },
     icon: <Icon name="caution-octagon" color={colors.red} />,
     color: colors.red,
@@ -135,9 +135,9 @@ const LOG_TYPES: {
   lifecycle: {
     label: 'Lifecycle',
     style: {
-      backgroundColor: colors.redTint,
-      color: colors.red,
-      fontWeight: 700,
+      backgroundColor: '#D2EACF',
+      color: '#A51F3C',
+      fontWeight: 600,
     },
     icon: <Icon name="stop" color={colors.red} />,
     color: colors.red,
@@ -372,7 +372,7 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
 
   const formattedDate = formatDate(entry.date)
 
-  const entryType = "other"
+  const entryType = "lifecycle"
   const {icon, style} = LOG_TYPES[entryType]
   if (entry.message)
   console.log("style")
@@ -739,6 +739,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         additionalData={this.state.additionalData}
         contextData={this.state.contextData}
         hitData={this.state.hitData}
+        eventsAndProductsData={[]}
         onChange={contextData =>
           this.setState({contextData}, () =>
             window.localStorage.setItem(
@@ -782,7 +783,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
           highlightedRows={this.state.highlightedRows}
           onRowHighlighted={this.onRowHighlighted}
           multiHighlight={false}
-          zebra={true}
+          zebra={false}
           actions={<Button onClick={this.clearLogs}>Clear Logs</Button>}
           allowRegexSearch={false}
           // If the logs is opened through deeplink, then don't scroll as the row is highlighted

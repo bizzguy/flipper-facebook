@@ -37,7 +37,8 @@ type Props = {|
   counters: Array<Counter>,
   additionalData: Array<NameValuePair>,
   contextData: Array<NameValuePair>,
-  hitData: Array<NameValuePair>
+  hitData: Array<NameValuePair>,
+  eventsAndProductsData: Array<NameValuePair>,
 |};
 
 type State = {
@@ -45,9 +46,17 @@ type State = {
   highlightedRow: ?string
 };
 
+const WrappingText = styled(Text)({
+  wordWrap: 'break-word',
+  display: inline-block,
+  width: '100%',
+  lineHeight: '125%',
+  padding: '3px 0',
+});
+
 const ColumnSizes = {
   keyColumn: '30%',
-  valueColumn: 'flex',
+  valueColumn: '70%',
 };
 
 const Columns = {
@@ -193,6 +202,21 @@ export default class LogWatcher extends PureComponent<Props, State> {
     const rows = this.props.hitData.map(({name, value}, i) => ({
       columns: {
         keyColumn: {
+          value: <WrappingText >   {name}</WrappingText>
+        },
+        valueColumn: {
+          value: <WrappingText>{value}</WrappingText>
+        },
+      },
+      key: name,
+    }));
+    return rows
+  };
+
+  buildRowsEventsAndProductsData = (): Array<TableBodyRow> => {
+    const rows = this.props.eventsAndProductsData.map(({name, value}, i) => ({
+      columns: {
+        keyColumn: {
           value: <Text code={true}>   {name}</Text>,
         },
         valueColumn: {
@@ -265,6 +289,22 @@ export default class LogWatcher extends PureComponent<Props, State> {
             columnSizes={ColumnSizes}
             columns={Columns}
             rows={this.buildRowsContextData()}
+            autoHeight={true}
+            floating={false}
+            zebra={true}
+            highlightableRows={true}
+            multiHighlight={false}
+            multiline={true}
+          />
+        </WatcherPanel>
+        <WatcherPanel
+          heading="Events and Products"
+          floating={false}
+          padded={false}>
+          <ManagedTable
+            columnSizes={ColumnSizes}
+            columns={Columns}
+            rows={this.buildRowsEventsAndProductsData()}
             autoHeight={true}
             floating={false}
             zebra={true}

@@ -48,7 +48,6 @@ type State = {
 
 const WrappingText = styled(Text)({
   wordWrap: 'break-word',
-  display: inline-block,
   width: '100%',
   lineHeight: '125%',
   padding: '3px 0',
@@ -279,6 +278,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             highlightableRows={true}
             multiHighlight={false}
             multiline={true}
+            enableKeyboardNavigation={false}
           />
         </WatcherPanel>
         <WatcherPanel

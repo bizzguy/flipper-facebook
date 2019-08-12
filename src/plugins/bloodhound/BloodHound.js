@@ -54,8 +54,8 @@ const WrappingText = styled(Text)({
 });
 
 const ColumnSizes = {
-  keyColumn: '30%',
-  valueColumn: '70%',
+  keyColumn: '35%',
+  valueColumn: '65%',
 };
 
 const Columns = {
@@ -275,7 +275,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             autoHeight={true}
             floating={false}
             zebra={true}
-            highlightableRows={true}
+            highlightableRows={false}
             multiHighlight={false}
             multiline={true}
             enableKeyboardNavigation={false}
@@ -292,9 +292,10 @@ export default class LogWatcher extends PureComponent<Props, State> {
             autoHeight={true}
             floating={false}
             zebra={true}
-            highlightableRows={true}
+            highlightableRows={false}
             multiHighlight={false}
             multiline={true}
+            enableKeyboardNavigation={false}
           />
         </WatcherPanel>
         <WatcherPanel
@@ -308,9 +309,10 @@ export default class LogWatcher extends PureComponent<Props, State> {
             autoHeight={true}
             floating={false}
             zebra={true}
-            highlightableRows={true}
+            highlightableRows={false}
             multiHighlight={false}
             multiline={true}
+            enableKeyboardNavigation={false}
           />
         </WatcherPanel>
         <WatcherPanel
@@ -328,6 +330,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             highlightableRows={false}
             multiHighlight={false}
             multiline={true}
+            enableKeyboardNavigation={false}
           />
         </WatcherPanel>
       </FlexColumn>

@@ -15,6 +15,7 @@ import type {Counter} from './BloodHound.js';
 import type {NameValuePair} from './BloodHound.js';
 import type {DeviceLogEntry} from '../../devices/BaseDevice.js';
 import type {Props as PluginProps} from '../../plugin';
+import {formatDate, getPageName, trimStartEndChars, pad, getEntryType} from './utils.js';
 
 import {
   Text,
@@ -85,7 +86,7 @@ function keepKeys(obj, keys) {
 }
 
 const COLUMN_SIZE = {
-  hitColumn: 270,
+  hitColumn: 315,
   time: 115
 };
 
@@ -185,14 +186,6 @@ const LogCount = styled('div')(({backgroundColor}) => ({
   whiteSpace: 'nowrap',
 }));
 
-function pad(chunk: mixed, len: number): string {
-  let str = String(chunk);
-  while (str.length < len) {
-    str = `0${str}`;
-  }
-  return str;
-}
-
 export function addEntriesToState(
   items: Entries,
   state: $Shape<State> = {
@@ -235,40 +228,12 @@ export function addRowIfNeeded(
   previousEntry: ?DeviceLogEntry,
 ) {
     rows.unshift(row);
-    console.log(rows)
-}
-
-function getPageName(textString: string): string {
-  //const messageAnd = "ADBMobile Debug : Analytics - Request Queued (ndh=1&ce=UTF-8&c.&a.&CarrierName=Android&AppID=Foot%20Locker%203.8.0.debug%20%284007212%29&RunMode=Application&OSVersion=Android%208.1.0&TimeSinceLaunch=149500&Resolution=1440x2712&DeviceName=Android%20SDK%20built%20for%20x86&.a&logged_in=n&banner=mobileapp.footlocker.com&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20300&aamb=j8Odv6LonN4r3an7LhD3WZrU1bUpAkFkkiY1ncBR96t2PTI&mid=06473502235624536297363351139995300016&pageName=fl%3Am%3Alog_in&cp=foreground&aamlh=7)"
-  var trimmedString = trimStartEndChars(textString)
-  var decodedTrimmedString = decodeURIComponent(trimmedString);
-  var params = decodedTrimmedString.split("&");
-  let found = params.find(element => element.includes("pageName"));
-  if (typeof(found) == "undefined") {
-    return "* pageName not found"
-  }
-  let param = found.split("=")
-  let paramValue = param[1];
-  return paramValue;
-}
-
-function trimStartEndChars(textString: string): string {
-  // Android Format
-  var trimmedString = textString.replace('ADBMobile Debug : Analytics - Request Queued (','');
-  // iOS Format
-  trimmedString = trimmedString.replace('ADBMobile Debug: Analytics - Request Queued (','');
-
-  trimmedString = trimmedString.substr(0, trimmedString.length - 1);
-  return trimmedString;
 }
 
 function getContextData(textString: string): Array<string> {
-  console.log("...running getContextData")
   var trimmedString = trimStartEndChars(textString)
   var decodedTrimmedString = decodeURIComponent(trimmedString);
   var params = decodedTrimmedString.split("&");
-
-  console.log(params)
 
   let newParams = []
 
@@ -305,7 +270,6 @@ function getContextData(textString: string): Array<string> {
   }
 
   newParams.sort()
-  console.log(newParams)
   return newParams;
 }
 
@@ -356,11 +320,6 @@ function getHitData(textString: string, row): Array<NameValuePair> {
   return newHitData;
 }
 
-function formatDate(dateString: string): string {
-  var formattedDate = dateString.toTimeString().split(' ')[0] + '.' + pad(dateString.getMilliseconds(), 3)
-  return formattedDate;
-}
-
 export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBodyRow, entry: DeviceLogEntry} {
     // build the item, it will either be batched or added straight away
 
@@ -372,7 +331,9 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
 
   const formattedDate = formatDate(entry.date)
 
-  const entryType = "lifecycle"
+  const entryType = getEntryType(entry.message)
+  console.log('Entry Type: ' + entryType)
+
   const {icon, style} = LOG_TYPES[entryType]
   if (entry.message)
   console.log("style")
@@ -511,9 +472,6 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
   constructor(props: PluginProps<PersistedState>) {
     super(props);
 
-    console.log('device:')
-    console.log(this.device)
-
     const supportedColumns = this.device.supportedColumns();
 
     this.columns = keepKeys(COLUMNS, supportedColumns);
@@ -546,7 +504,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     };
 
     this.logListener = this.device.addLogListener((entry: DeviceLogEntry) => {
-      if (entry.message.match('Analytics - Request Queued')) {
+      if (entry.tag.match('ADBMobile') && entry.message.match('Analytics - Request Queued')) {
         const processedEntry = processEntry(entry, String(this.counter++));
         this.incrementCounterIfNeeded(processedEntry.entry);
         this.scheudleEntryForBatch(processedEntry);
@@ -686,17 +644,12 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     let message = currentEntry.message
 
     let newContextData = getContextData(message)
-    console.log('newContextData')
-    console.log(newContextData)
     for (const newContextDataElement of newContextData){
-      console.log(newContextDataElement)
       let paramName = String(newContextDataElement)
-      console.log(paramName)
       let param = paramName.split("=")
       this.state.contextData.push({name: param[0] , value: param[1] })
     }
     this.setState({contextData});
-    console.log(this.state.contextData)
 
     // assign additional data
     let additionalData = this.state.additionalData
@@ -706,12 +659,8 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     }
 
     let newAdditionalData = getAdditionalData(message)
-    console.log('newAdditionalData')
-    console.log(newAdditionalData)
     for (const newAdditionalDataElement of newAdditionalData){
-      console.log(newAdditionalDataElement)
       let paramName = String(newAdditionalDataElement)
-      console.log(paramName)
       let param = paramName.split("=")
       this.state.additionalData.push({name: param[0] , value: param[1] })
     }
@@ -719,7 +668,6 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     console.log(this.state.additionalData)
 
     // assign hit data
-    console.log(currentRow)
     let hitData = getHitData(message, currentRow)
     this.setState({hitData})
 
@@ -772,7 +720,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         buildItems={this.buildContextMenuItems}
         component={FlexColumn}>
         <SearchableTable
-           width={500}
+           width={400}
           innerRef={this.setTableRef}
           floating={false}
           multiline={true}
@@ -791,7 +739,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
             !(this.props.deepLinkPayload && this.state.highlightedRows.size > 0)
           }
         />
-        <DetailSidebar width={550}>{this.renderSidebar()}</DetailSidebar>
+        <DetailSidebar width={650}>{this.renderSidebar()}</DetailSidebar>
       </LogTable.ContextMenu>
     );
   }

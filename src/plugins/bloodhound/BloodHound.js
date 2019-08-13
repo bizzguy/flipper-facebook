@@ -99,9 +99,11 @@ const WatcherPanel = styled(Panel)({
 });
 
 export default class LogWatcher extends PureComponent<Props, State> {
+
   state = {
     input: '',
-    highlightedRow: null
+    highlightedRow: null,
+    epPanelIsShown: false
   };
 
   _inputRef: ?HTMLInputElement;
@@ -262,6 +264,13 @@ export default class LogWatcher extends PureComponent<Props, State> {
   };
 
   render() {
+
+    if (this.props.eventsAndProductsData.length > 0) {
+      this.state.epPanelIsShown = true
+    } else {
+      this.state.epPanelIsShown = false
+    }
+
     return (
       <FlexColumn grow={true} tabIndex={-1} onKeyDown={this.onKeyDown}>
         <WatcherPanel
@@ -298,6 +307,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             enableKeyboardNavigation={false}
           />
         </WatcherPanel>
+        {this.state.epPanelIsShown &&
         <WatcherPanel
           heading="Events and Products"
           floating={false}
@@ -315,6 +325,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
             enableKeyboardNavigation={false}
           />
         </WatcherPanel>
+        }
         <WatcherPanel
           collapsed={true}
           heading="Hit Details and Diagnostic Data"

@@ -51,6 +51,7 @@ type State = {|
   counters: Array<Counter>,
   additionalData: Array<NameValuePair>,
   contextData: Array<NameValuePair>,
+  eventsAndProductsData: Array<NameValuePair>,
   hitData: Array<NameValuePair>
 |};
 
@@ -316,7 +317,6 @@ function getHitData(textString: string, row): Array<NameValuePair> {
   const message = String(row.entry.message)
   newHitData.push({name: 'Message' , value: message })
 
-  console.log(newHitData)
   return newHitData;
 }
 
@@ -332,14 +332,7 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
   const formattedDate = formatDate(entry.date)
 
   const entryType = getEntryType(entry.message)
-  console.log('Entry Type: ' + entryType)
-
   const {icon, style} = LOG_TYPES[entryType]
-  if (entry.message)
-  console.log("style")
-  console.log(LOG_TYPES)
-  console.log(icon)
-  console.log(style)
 
   return {
     row: {
@@ -500,6 +493,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       counters: this.restoreSavedCounters(),
       contextData: [],
       additionalData: [],
+      eventsAndProductsData: [],
       hitData: []
     };
 
@@ -636,9 +630,13 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
 
     // assign context data
     let contextData = this.state.contextData
+    let eventsAndProductsData = this.state.eventsAndProductsData
 
     while (contextData.length) {
         contextData.pop();
+    }
+    while (eventsAndProductsData.length) {
+        eventsAndProductsData.pop();
     }
 
     let message = currentEntry.message
@@ -648,8 +646,15 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       let paramName = String(newContextDataElement)
       let param = paramName.split("=")
       this.state.contextData.push({name: param[0] , value: param[1] })
+
+      // build event&product entries
+      const entryType = getEntryType(message)
+      if (entryType == 'lifecycle') {
+        this.state.eventsAndProductsData.push({name: 'testName' , value: 'testValue' })
+      }
     }
     this.setState({contextData});
+    this.setState({eventsAndProductsData});
 
     // assign additional data
     let additionalData = this.state.additionalData
@@ -665,7 +670,6 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       this.state.additionalData.push({name: param[0] , value: param[1] })
     }
     this.setState({additionalData});
-    console.log(this.state.additionalData)
 
     // assign hit data
     let hitData = getHitData(message, currentRow)
@@ -676,18 +680,13 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
 
   renderSidebar = () => {
     console.log("...running renderSidebar")
-    /*
-    console.log(this.state.counters)
-    console.log(this.state.additionalData)
-    console.log(this.state.contextData)
-    */
     return (
       <LogWatcher
         counters={this.state.counters}
         additionalData={this.state.additionalData}
         contextData={this.state.contextData}
         hitData={this.state.hitData}
-        eventsAndProductsData={[]}
+        eventsAndProductsData={this.state.eventsAndProductsData}
         onChange={contextData =>
           this.setState({contextData}, () =>
             window.localStorage.setItem(

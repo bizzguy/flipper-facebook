@@ -15,7 +15,7 @@ import type {Counter} from './BloodHound.js';
 import type {NameValuePair} from './BloodHound.js';
 import type {DeviceLogEntry} from '../../devices/BaseDevice.js';
 import type {Props as PluginProps} from '../../plugin';
-import {formatDate, getPageName, trimStartEndChars, pad, getEntryType} from './utils.js';
+import {formatDate, getPageName, trimStartEndChars, pad, getEntryType, getTestDataRow} from './utils.js';
 
 import {
   Text,
@@ -270,7 +270,8 @@ function getContextData(textString: string): Array<string> {
     }
   }
 
-  newParams.sort()
+  newParams .sort((a, b) => (a.toLowerCase() > b.toLowerCase()) ? 1 : -1)
+
   return newParams;
 }
 
@@ -320,14 +321,35 @@ function getHitData(textString: string, row): Array<NameValuePair> {
   return newHitData;
 }
 
-export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBodyRow, entry: DeviceLogEntry} {
-    // build the item, it will either be batched or added straight away
+let testDataRowNumber = 0;
+let testDataRowNumberMax = 11
 
-  //const messageIos = "ADBMobile Debug: Analytics - Request Queued (ndh=1&t=00%2F00%2F0000%2000%3A00%3A00%200%20300&c.&banner=mobileapp.champssports.com&a.&OSVersion=iOS%2012.2&CarrierName=%28null%29&DeviceName=x86_64&AppID=ChampsDebug%203.8.0%20%285656%29&RunMode=Application&Resolution=828x1792&TimeSinceLaunch=325&.a&logged_in=n&.c&mid=72250179487144388442186498043366925718&pageName=cs%3Am%3Alog_in&ce=UTF-8&aamlh=9&cp=foreground&aamb=j8Odv6LonN4r3an7LhD3WZrU1bUpAkFkkiY1ncBR96t2PTI)"
-  //entry.message = messageIos
+export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBodyRow, entry: DeviceLogEntry} {
+    // build the item, it will either be batched or added straight awa
+
+  testDataRowNumber++
+  //if (testDataRowNumber <= testDataRowNumberMax) {
+  //  console.log("override row with " + testDataRowNumber)
+  //  entry.message = getTestDataRow(testDataRowNumber)
+  //}
 
   // calculate hit value
-  const hitValue = getPageName(entry.message)
+  let hitValue = getPageName(entry.message)
+
+  // override pageName if there is an a.action attribute
+  let newContextData = getContextData(entry.message)
+  for (const newContextDataElement of newContextData){
+    let paramName = String(newContextDataElement)
+    let param = paramName.split("=")
+    if (param[0] == 'a.action') {
+      hitValue = param[1]
+    }
+  }
+
+  // override pageName if there is an a.internalaction=Lifecycle attribute
+  if (entry.message.match('&internalaction=Lifecycle')) {
+    hitValue = 'Lifecycle'
+  }
 
   const formattedDate = formatDate(entry.date)
 
@@ -392,6 +414,8 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
 
   initTimer: ?TimeoutID;
   batchTimer: ?TimeoutID;
+
+  testDataRowNumber = 1;
 
   static supportsDevice(device: Device) {
     return device.os === 'iOS' || device.os === 'Android';
@@ -630,13 +654,9 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
 
     // assign context data
     let contextData = this.state.contextData
-    let eventsAndProductsData = this.state.eventsAndProductsData
 
     while (contextData.length) {
         contextData.pop();
-    }
-    while (eventsAndProductsData.length) {
-        eventsAndProductsData.pop();
     }
 
     let message = currentEntry.message
@@ -646,30 +666,51 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       let paramName = String(newContextDataElement)
       let param = paramName.split("=")
       this.state.contextData.push({name: param[0] , value: param[1] })
-
-      // build event&product entries
-      const entryType = getEntryType(message)
-      if (entryType == 'lifecycle') {
-        this.state.eventsAndProductsData.push({name: 'testName' , value: 'testValue' })
-      }
     }
     this.setState({contextData});
-    this.setState({eventsAndProductsData});
 
     // assign additional data
     let additionalData = this.state.additionalData
+    let eventsAndProductsData = this.state.eventsAndProductsData
 
     while (additionalData.length) {
         additionalData.pop();
+    }
+    while (eventsAndProductsData.length) {
+        eventsAndProductsData.pop();
     }
 
     let newAdditionalData = getAdditionalData(message)
     for (const newAdditionalDataElement of newAdditionalData){
       let paramName = String(newAdditionalDataElement)
       let param = paramName.split("=")
-      this.state.additionalData.push({name: param[0] , value: param[1] })
+      if (param[0] == 'events') {
+        console.log('found events')
+        this.state.eventsAndProductsData.push({name: param[0] , value: param[1] })
+      } else if (param[0] == 'products') {
+        console.log('found products')
+        this.state.eventsAndProductsData.push({name: param[0] , value: param[1] })
+
+        try {
+          // do something
+        } catch (err) {
+          // do something
+        }
+
+        const productParams = param[1].split(';')
+        console.log("productParams")
+        console.log(productParams)
+        for (const productParam of productParams){
+          if (productParam != "") {
+            this.state.eventsAndProductsData.push({name: '' , value: '  ' + productParam })
+          }
+        }
+      } else {
+        this.state.additionalData.push({name: param[0] , value: param[1] })
+      }
     }
     this.setState({additionalData});
+    this.setState({eventsAndProductsData});
 
     // assign hit data
     let hitData = getHitData(message, currentRow)
@@ -719,7 +760,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         buildItems={this.buildContextMenuItems}
         component={FlexColumn}>
         <SearchableTable
-           width={400}
+           width={310}
           innerRef={this.setTableRef}
           floating={false}
           multiline={true}
@@ -738,7 +779,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
             !(this.props.deepLinkPayload && this.state.highlightedRows.size > 0)
           }
         />
-        <DetailSidebar width={650}>{this.renderSidebar()}</DetailSidebar>
+        <DetailSidebar width={400}>{this.renderSidebar()}</DetailSidebar>
       </LogTable.ContextMenu>
     );
   }

@@ -686,24 +686,41 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       let param = paramName.split("=")
       if (param[0] == 'events') {
         console.log('found events')
+        // test
+        //param[1] = "ScmE,ScmE2"
         this.state.eventsAndProductsData.push({name: param[0] , value: param[1] })
+                try {
+                    // parse products
+                    let eventNbr = 1
+                    const events = param[1].split(',')
+                    for (const event of events){
+                        this.state.eventsAndProductsData.push({name: '  event ' + eventNbr , value: event })
+                        eventNbr++
+                    }
+                } catch (err) {
+                  this.state.eventsAndProductsData.push({name: '' , value: '*** Parsing Error ***' })
+                }
       } else if (param[0] == 'products') {
         console.log('found products')
+        // test
+        //param[1] = ";EG8101;3;180.0,;XEG8102;6;360.0"
         this.state.eventsAndProductsData.push({name: param[0] , value: param[1] })
-
         try {
-          // do something
+            // parse products
+            let productNbr = 1
+            const products = param[1].split(',')
+            for (const product of products){
+                this.state.eventsAndProductsData.push({name: '  product ' + productNbr , value: product })
+                const productAttrs = product.split(';')
+                console.log("productAttrs")
+                console.log(productAttrs)
+                this.state.eventsAndProductsData.push({name: '    sku' , value: '  ' + productAttrs[1] })
+                this.state.eventsAndProductsData.push({name: '    qty' , value: '  ' + productAttrs[2] })
+                this.state.eventsAndProductsData.push({name: '    price' , value: '  ' + productAttrs[3] })
+                productNbr++
+            }
         } catch (err) {
-          // do something
-        }
-
-        const productParams = param[1].split(';')
-        console.log("productParams")
-        console.log(productParams)
-        for (const productParam of productParams){
-          if (productParam != "") {
-            this.state.eventsAndProductsData.push({name: '' , value: '  ' + productParam })
-          }
+          this.state.eventsAndProductsData.push({name: '' , value: '*** Parsing Error ***' })
         }
       } else {
         this.state.additionalData.push({name: param[0] , value: param[1] })
@@ -779,7 +796,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
             !(this.props.deepLinkPayload && this.state.highlightedRows.size > 0)
           }
         />
-        <DetailSidebar width={400}>{this.renderSidebar()}</DetailSidebar>
+        <DetailSidebar width={450}>{this.renderSidebar()}</DetailSidebar>
       </LogTable.ContextMenu>
     );
   }

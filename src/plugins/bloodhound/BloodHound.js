@@ -8,6 +8,7 @@
 import type {TableBodyRow} from 'flipper';
 
 import {
+  FlexRow,
   PureComponent,
   FlexColumn,
   Panel,
@@ -19,6 +20,11 @@ import {
   colors,
   styled,
 } from 'flipper';
+
+const ToolbarItem = styled(FlexRow)({
+  alignItems: 'center',
+  marginLeft: '8px',
+});
 
 export type Counter = {
   expression: RegExp,
@@ -289,6 +295,11 @@ export default class LogWatcher extends PureComponent<Props, State> {
             multiline={true}
             enableKeyboardNavigation={false}
           />
+        <Toolbar collapsed={true}>
+            <ToolbarItem>
+                <Button title="Cut">Cut</Button>
+            </ToolbarItem>
+        </Toolbar>
         </WatcherPanel>
         <WatcherPanel
           heading="Context Data"

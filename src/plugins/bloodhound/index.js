@@ -232,47 +232,54 @@ export function addRowIfNeeded(
 }
 
 function getContextData(textString: string): Array<string> {
-  var trimmedString = trimStartEndChars(textString)
-  var decodedTrimmedString = decodeURIComponent(trimmedString);
-  var params = decodedTrimmedString.split("&");
 
-  let newParams = []
+    try {
+        var trimmedString = trimStartEndChars(textString)
+        var decodedTrimmedString = decodeURIComponent(trimmedString);
+        var params = decodedTrimmedString.split("&");
 
-  let inC = false
-  let inA = false
+        let newParams = []
 
-  for (const param of params){
-    if (param == "c.") {
-      inC = true
-      continue
-    }
-    if (param == "a.") {
-      inA = true
-      continue
-    }
-    if (param == ".c") {
-      inC = false
-      continue
-    }
-    if (param == ".a") {
-      inA = false
-      continue
-    }
+        let inC = false
+        let inA = false
 
-    if (inA) {
-        let newParam = 'a.' + param
-        newParams.push(newParam)
-        continue
-    }
-    if (inC) {
-        newParams.push(param)
-        continue
-    }
-  }
+        for (const param of params){
+            if (param == "c.") {
+                inC = true
+                continue
+            }
+            if (param == "a.") {
+                inA = true
+                continue
+            }
+            if (param == ".c") {
+                inC = false
+                continue
+            }
+            if (param == ".a") {
+                inA = false
+                continue
+            }
 
-  newParams .sort((a, b) => (a.toLowerCase() > b.toLowerCase()) ? 1 : -1)
+            if (inA) {
+              let newParam = 'a.' + param
+              newParams.push(newParam)
+              continue
+            }
+            if (inC) {
+              newParams.push(param)
+              continue
+            }
 
-  return newParams;
+        }
+
+        newParams .sort((a, b) => (a.toLowerCase() > b.toLowerCase()) ? 1 : -1)
+
+        return newParams;
+
+    } catch (err) {
+        return []
+    }
 }
 
 function getAdditionalData(textString: string): Array<string> {

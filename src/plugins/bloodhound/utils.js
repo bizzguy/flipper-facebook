@@ -5,16 +5,21 @@ export function formatDate(dateString: string): string {
 }
 
 export function getPageName(textString: string): string {
-  var trimmedString = trimStartEndChars(textString)
-  var decodedTrimmedString = decodeURIComponent(trimmedString);
-  var params = decodedTrimmedString.split("&");
-  let found = params.find(element => element.includes("pageName"));
-  if (typeof(found) == "undefined") {
-    return "* pageName not found"
-  }
-  let param = found.split("=")
-  let paramValue = param[1];
-  return paramValue;
+
+    try {
+        var trimmedString = trimStartEndChars(textString)
+        var decodedTrimmedString = decodeURIComponent(trimmedString);
+        var params = decodedTrimmedString.split("&");
+        let found = params.find(element => element.includes("pageName"));
+        if (typeof(found) == "undefined") {
+            return "* pageName not found"
+        }
+        let param = found.split("=")
+        let paramValue = param[1];
+        return paramValue;
+    } catch (err) {
+      return "* pageName not parseable"
+    }
 }
 
 export function trimStartEndChars(textString: string): string {

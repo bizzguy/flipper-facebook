@@ -87,28 +87,36 @@ function keepKeys(obj, keys) {
 }
 
 const COLUMN_SIZE = {
-  hitColumn: 315,
-  time: 115
+  time: 120,
+  tag: 120,
+  message: 'flex',
 };
 
 const COLUMNS = {
-  hitColumn: {
-    value: 'Hit'
-  },
   time: {
-    value: 'Time'
-  }
+    value: 'Time',
+  },
+  tag: {
+    value: 'Tag',
+  },
+  message: {
+    value: 'Message',
+  },
 };
 
 const INITIAL_COLUMN_ORDER = [
   {
-    key: 'hitColumn',
+    key: 'time',
     visible: true,
   },
   {
-    key: 'time',
+    key: 'tag',
     visible: true,
-  }
+  },
+     {
+       key: 'message',
+       visible: true,
+     }
 ];
 
 const LOG_TYPES: {
@@ -378,11 +386,6 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
         message: {
           value: (
             <HiddenScrollText code={true}>{entry.message}</HiddenScrollText>
-          ),
-        },
-        hitColumn: {
-          value: (
-            <HiddenScrollText code={true}>{hitValue}</HiddenScrollText>
           ),
         },
         tag: {

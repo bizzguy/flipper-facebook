@@ -334,7 +334,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
         }
         <WatcherPanel
           collapsed={true}
-          heading="Hit Details and Diagnostic Data"
+          heading="Message Data"
           floating={false}
           padded={false}>
           <ManagedTable

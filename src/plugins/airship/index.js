@@ -96,9 +96,6 @@ const COLUMNS = {
   time: {
     value: 'Time',
   },
-  tag: {
-    value: 'Tag',
-  },
   message: {
     value: 'Message',
   },
@@ -110,13 +107,9 @@ const INITIAL_COLUMN_ORDER = [
     visible: true,
   },
   {
-    key: 'tag',
+    key: 'message',
     visible: true,
-  },
-     {
-       key: 'message',
-       visible: true,
-     }
+  }
 ];
 
 const LOG_TYPES: {
@@ -329,6 +322,9 @@ function getHitData(textString: string, row): Array<NameValuePair> {
 
   const unformattedTime = String(row.entry.date)
   newHitData.push({name: 'Unformatted Date' , value: unformattedTime })
+
+  const tag = String(row.entry.tag)
+  newHitData.push({name: 'Tag' , value: tag })
 
   const pid = String(row.entry.pid)
   newHitData.push({name: 'PID' , value: pid })

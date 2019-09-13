@@ -65,8 +65,14 @@ export function filterLogMessage(log: string): boolean {
   // return true to include message
   // return false to exclude message
   //console.log(log)
-  if (log.tag.match('UALib')) return true;
-  if (log.message.match('airship')) return true;
-  return false;
+
+  var include = false
+  if (log.tag.toLowerCase().match('ualib')) include = true
+  if (log.message.toLowerCase().match('airship')) include = true
+
+  if (log.tag.match('SurfaceFlinger')) include = false
+  if (log.tag.match('ActivityManager')) include = false
+
+  return include;
 }
 

@@ -15,7 +15,7 @@ import type {Counter} from './Airship.js';
 import type {NameValuePair} from './Airship.js';
 import type {DeviceLogEntry} from '../../devices/BaseDevice.js';
 import type {Props as PluginProps} from '../../plugin';
-import {formatDate, getPageName, trimStartEndChars, pad, getEntryType, getTestDataRow} from './utils.js';
+import {formatDate, getPageName, trimStartEndChars, pad, getEntryType, getTestDataRow, filterLogMessage} from './utils.js';
 
 import {
   Text,
@@ -88,7 +88,7 @@ function keepKeys(obj, keys) {
 
 const COLUMN_SIZE = {
   time: 120,
-  tag: 120,
+  tag: 180,
   message: 'flex',
 };
 
@@ -330,6 +330,9 @@ function getHitData(textString: string, row): Array<NameValuePair> {
   const unformattedTime = String(row.entry.date)
   newHitData.push({name: 'Unformatted Date' , value: unformattedTime })
 
+  const pid = String(row.entry.pid)
+  newHitData.push({name: 'PID' , value: pid })
+
   const message = String(row.entry.message)
   newHitData.push({name: 'Message' , value: message })
 
@@ -514,7 +517,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     const initialState = addEntriesToState(
       this.device
         .getLogs()
-        .filter(log => log.message.match('Analytics - Request Queued'))
+        .filter(log => filterLogMessage(log))
         .map(log => processEntry(log, String(this.counter++))),
     );
 

@@ -61,3 +61,12 @@ export function getTestDataRow(testDataRowNumber: number): string {
 
 }
 
+export function filterLogMessage(log: string): boolean {
+  // return true to include message
+  // return false to exclude message
+  //console.log(log)
+  if (log.tag.match('UALib')) return true;
+  if (log.message.match('airship')) return true;
+  return false;
+}
+

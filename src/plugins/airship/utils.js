@@ -67,10 +67,11 @@ export function filterLogMessage(log: string): boolean {
   //console.log(log)
 
   var include = false
-  if (log.tag.toLowerCase().match('ualib')) include = true
+  if (log.tag.toLowerCase().match('ualib'))       include = true
   if (log.message.toLowerCase().match('airship')) include = true
+  if (log.tag.toLowerCase().match('channel id'))  include = true
 
-  if (log.tag.match('SurfaceFlinger')) include = false
+  if (log.tag.match('SurfaceFlinger'))  include = false
   if (log.tag.match('ActivityManager')) include = false
 
   return include;

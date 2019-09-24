@@ -44,7 +44,7 @@ type Props = {|
   additionalData: Array<NameValuePair>,
   contextData: Array<NameValuePair>,
   hitData: Array<NameValuePair>,
-  eventsAndProductsData: Array<NameValuePair>,
+  airshipData: Array<NameValuePair>,
 |};
 
 type State = {
@@ -109,7 +109,7 @@ export default class LogWatcher extends PureComponent<Props, State> {
   state = {
     input: '',
     highlightedRow: null,
-    epPanelIsShown: false
+    airshipPanelIsShown: false
   };
 
   _inputRef: ?HTMLInputElement;
@@ -220,8 +220,8 @@ export default class LogWatcher extends PureComponent<Props, State> {
     return rows
   };
 
-  buildRowsEventsAndProductsData = (): Array<TableBodyRow> => {
-    const rows = this.props.eventsAndProductsData.map(({name, value}, i) => ({
+  buildRowsAirshipData = (): Array<TableBodyRow> => {
+    const rows = this.props.airshipData.map(({name, value}, i) => ({
       columns: {
         keyColumn: {
           value: <Text code={true}>   {name}</Text>,
@@ -271,57 +271,23 @@ export default class LogWatcher extends PureComponent<Props, State> {
 
   render() {
 
-    if (this.props.eventsAndProductsData.length > 0) {
-      this.state.epPanelIsShown = true
+    if (this.props.airshipData.length > 0) {
+      this.state.airshipPanelIsShown = true
     } else {
-      this.state.epPanelIsShown = false
+      this.state.airshipPanelIsShown = false
     }
 
     return (
       <FlexColumn grow={true} tabIndex={-1} onKeyDown={this.onKeyDown}>
+        {this.state.airshipPanelIsShown &&
         <WatcherPanel
-          heading="Additional Data"
+          heading="Airship Data"
           floating={false}
           padded={false}>
           <ManagedTable
             columnSizes={ColumnSizes}
             columns={Columns}
-            rows={this.buildRowsAdditionalData()}
-            autoHeight={true}
-            floating={false}
-            zebra={true}
-            highlightableRows={false}
-            multiHighlight={false}
-            multiline={true}
-            enableKeyboardNavigation={false}
-          />
-        </WatcherPanel>
-        <WatcherPanel
-          heading="Context Data"
-          floating={false}
-          padded={false}>
-          <ManagedTable
-            columnSizes={ColumnSizes}
-            columns={Columns}
-            rows={this.buildRowsContextData()}
-            autoHeight={true}
-            floating={false}
-            zebra={true}
-            highlightableRows={false}
-            multiHighlight={false}
-            multiline={true}
-            enableKeyboardNavigation={false}
-          />
-        </WatcherPanel>
-        {this.state.epPanelIsShown &&
-        <WatcherPanel
-          heading="Events and Products"
-          floating={false}
-          padded={false}>
-          <ManagedTable
-            columnSizes={ColumnSizes}
-            columns={Columns}
-            rows={this.buildRowsEventsAndProductsData()}
+            rows={this.buildRowsAirshipData()}
             autoHeight={true}
             floating={false}
             zebra={true}

@@ -51,7 +51,7 @@ type State = {|
   counters: Array<Counter>,
   additionalData: Array<NameValuePair>,
   contextData: Array<NameValuePair>,
-  eventsAndProductsData: Array<NameValuePair>,
+  airshipData: Array<NameValuePair>,
   hitData: Array<NameValuePair>
 |};
 
@@ -526,12 +526,12 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       counters: this.restoreSavedCounters(),
       contextData: [],
       additionalData: [],
-      eventsAndProductsData: [],
+      airshipData: [],
       hitData: []
     };
 
     this.logListener = this.device.addLogListener((entry: DeviceLogEntry) => {
-      if (entry.tag.match('ADBMobile') && entry.message.match('Analytics - Request Queued')) {
+      if (filterLogMessage(entry)) {
         const processedEntry = processEntry(entry, String(this.counter++));
         this.incrementCounterIfNeeded(processedEntry.entry);
         this.scheudleEntryForBatch(processedEntry);
@@ -680,13 +680,13 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
 
     // assign additional data
     let additionalData = this.state.additionalData
-    let eventsAndProductsData = this.state.eventsAndProductsData
+    let airshipData = this.state.airshipData
 
     while (additionalData.length) {
         additionalData.pop();
     }
-    while (eventsAndProductsData.length) {
-        eventsAndProductsData.pop();
+    while (airshipData.length) {
+        airshipData.pop();
     }
 
     let newAdditionalData = getAdditionalData(message)
@@ -697,46 +697,46 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         console.log('found events')
         // test
         //param[1] = "ScmE,ScmE2"
-        this.state.eventsAndProductsData.push({name: param[0] , value: param[1] })
+        this.state.airshipData.push({name: param[0] , value: param[1] })
                 try {
                     // parse products
                     let eventNbr = 1
                     const events = param[1].split(',')
                     for (const event of events){
-                        this.state.eventsAndProductsData.push({name: '  event ' + eventNbr , value: event })
+                        this.state.airshipData.push({name: '  event ' + eventNbr , value: event })
                         eventNbr++
                     }
                 } catch (err) {
-                  this.state.eventsAndProductsData.push({name: '' , value: '*** Parsing Error ***' })
+                  this.state.airshipData.push({name: '' , value: '*** Parsing Error ***' })
                 }
       } else if (param[0] == 'products') {
         console.log('found products')
         // test
         //param[1] = ";EG8101;3;180.0,;XEG8102;6;360.0"
-        this.state.eventsAndProductsData.push({name: param[0] , value: param[1] })
+        this.state.airshipData.push({name: param[0] , value: param[1] })
         try {
             // parse products
             let productNbr = 1
             const products = param[1].split(',')
             for (const product of products){
-                this.state.eventsAndProductsData.push({name: '  product ' + productNbr , value: product })
+                this.state.airshipData.push({name: '  product ' + productNbr , value: product })
                 const productAttrs = product.split(';')
                 console.log("productAttrs")
                 console.log(productAttrs)
-                this.state.eventsAndProductsData.push({name: '    sku' , value: '  ' + productAttrs[1] })
-                this.state.eventsAndProductsData.push({name: '    qty' , value: '  ' + productAttrs[2] })
-                this.state.eventsAndProductsData.push({name: '    price' , value: '  ' + productAttrs[3] })
+                this.state.airshipData.push({name: '    sku' , value: '  ' + productAttrs[1] })
+                this.state.airshipData.push({name: '    qty' , value: '  ' + productAttrs[2] })
+                this.state.airshipData.push({name: '    price' , value: '  ' + productAttrs[3] })
                 productNbr++
             }
         } catch (err) {
-          this.state.eventsAndProductsData.push({name: '' , value: '*** Parsing Error ***' })
+          this.state.airshipData.push({name: '' , value: '*** Parsing Error ***' })
         }
       } else {
         this.state.additionalData.push({name: param[0] , value: param[1] })
       }
     }
     this.setState({additionalData});
-    this.setState({eventsAndProductsData});
+    this.setState({airshipData});
 
     // assign hit data
     let hitData = getHitData(message, currentRow)
@@ -753,7 +753,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         additionalData={this.state.additionalData}
         contextData={this.state.contextData}
         hitData={this.state.hitData}
-        eventsAndProductsData={this.state.eventsAndProductsData}
+        airshipData={this.state.airshipData}
         onChange={contextData =>
           this.setState({contextData}, () =>
             window.localStorage.setItem(

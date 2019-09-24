@@ -50,6 +50,8 @@ const KeyValueColumns = {
   },
 };
 
+const REQUEST_DETAILS_LOCAL_STORAGE_KEY_BODY_OPTIONS = 'REQUEST_DETAILS_LOCAL_STORAGE_KEY_BODY_OPTIONS';
+
 type RequestDetailsProps = {
   request: Request;
   response: Response | null | undefined;
@@ -72,7 +74,9 @@ export default class RequestDetails extends Component<
     parsed: 'parsed',
   };
 
-  state: RequestDetailsState = {bodyFormat: RequestDetails.BodyOptions.parsed};
+  state: RequestDetailsState = {
+      bodyFormat: window.localStorage.getItem(REQUEST_DETAILS_LOCAL_STORAGE_KEY_BODY_OPTIONS) || RequestDetails.BodyOptions.parsed
+  };
 
   urlColumns = (url: URL) => {
     return [
@@ -120,7 +124,21 @@ export default class RequestDetails extends Component<
   };
 
   onSelectFormat = (bodyFormat: string) => {
+    console.log("==========");
+    //console.log(this.state);
+    //console.log(bodyFormat)
+    //console.log(this.state.bodyFormat)
     this.setState(() => ({bodyFormat}));
+    //console.log(bodyFormat)
+    console.log(window.localStorage.getItem(REQUEST_DETAILS_LOCAL_STORAGE_KEY_BODY_OPTIONS))
+    window.localStorage.setItem(
+        REQUEST_DETAILS_LOCAL_STORAGE_KEY_BODY_OPTIONS,
+        JSON.stringify({bodyFormat}),
+    )
+    console.log(window.localStorage.getItem(REQUEST_DETAILS_LOCAL_STORAGE_KEY_BODY_OPTIONS))
+    //console.log(bodyFormat)
+    //console.log(this.state.bodyFormat)
+    //console.log(this.state);
   };
 
   render() {

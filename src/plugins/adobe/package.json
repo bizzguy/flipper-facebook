@@ -1,0 +1,13 @@
+{
+  "name": "Adobe Launch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {},
+  "title": "Adobe Launch",
+  "icon": "internet",
+  "bugs": {
+    "email": "oncall+flipper@xmail.facebook.com",
+    "url": "https://fb.workplace.com/groups/230455004101832/"
+  }
+}

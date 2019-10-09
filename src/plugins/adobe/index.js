@@ -325,6 +325,9 @@ function getHitData(textString: string, row): Array<NameValuePair> {
   const tag = String(row.entry.tag)
   newHitData.push({name: 'Tag' , value: tag })
 
+  const type = String(row.entry.type).toUpperCase()
+  newHitData.push({name: 'Type' , value: type })
+
   const pid = String(row.entry.pid)
   newHitData.push({name: 'PID' , value: pid })
 

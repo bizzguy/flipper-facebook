@@ -1,5 +1,5 @@
 {
-  "name": "Adobe Launch",
+  "name": "AdobeLaunch",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -7,3 +7,4 @@
   "title": "Adobe Launch",
   "icon": "missing-icon"
 }
+

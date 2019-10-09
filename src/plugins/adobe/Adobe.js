@@ -104,12 +104,112 @@ const WatcherPanel = styled(Panel)({
   minHeight: 40,
 });
 
+
+class JSONText extends Component<{children: any}> {
+  static NoScrollbarText = styled(Text)({
+    overflowY: 'hidden',
+  });
+
+  render() {
+    const jsonObject = this.props.children;
+    return (
+      <JSONText.NoScrollbarText code whiteSpace="pre" selectable>
+        {JSON.stringify(jsonObject, null, 2)}
+        {'\n'}
+      </JSONText.NoScrollbarText>
+    );
+  }
+}
+
+class JSONTextFormatter {
+  formatRequest = (request: Request) => {
+    return this.format(
+      decodeBody(request),
+      getHeaderValue(request.headers, 'content-type'),
+    );
+  };
+
+  formatResponse = (request: Request, response: Response) => {
+    return this.format(
+      decodeBody(response),
+      getHeaderValue(response.headers, 'content-type'),
+    );
+  };
+
+  format = (body: string, contentType: string) => {
+    if (
+      contentType.startsWith('application/json') ||
+      contentType.startsWith('application/hal+json') ||
+      contentType.startsWith('text/javascript') ||
+      contentType.startsWith('application/x-fb-flatbuffer')
+    ) {
+      try {
+        const data = JSON.parse(body);
+        return <JSONText>{data}</JSONText>;
+      } catch (SyntaxError) {
+        // Multiple top level JSON roots, map them one by one
+        return body
+          .split('\n')
+          .map(json => JSON.parse(json))
+          .map(data => <JSONText>{data}</JSONText>);
+      }
+    }
+  };
+}
+
+class JSONFormatter {
+  formatRequest = (request: Request) => {
+    return this.format(
+      decodeBody(request),
+      getHeaderValue(request.headers, 'content-type'),
+    );
+  };
+
+  formatResponse = (request: Request, response: Response) => {
+    return this.format(
+      decodeBody(response),
+      getHeaderValue(response.headers, 'content-type'),
+    );
+  };
+
+  format = (body: string, contentType: string) => {
+    if (
+      contentType.startsWith('application/json') ||
+      contentType.startsWith('application/hal+json') ||
+      contentType.startsWith('text/javascript') ||
+      contentType.startsWith('application/x-fb-flatbuffer')
+    ) {
+      try {
+        const data = JSON.parse(body);
+        return (
+          <ManagedDataInspector
+            collapsed={true}
+            expandRoot={true}
+            data={data}
+          />
+        );
+      } catch (SyntaxError) {
+        // Multiple top level JSON roots, map them one by one
+        const roots = body.split('\n');
+        return (
+          <ManagedDataInspector
+            collapsed={true}
+            expandRoot={true}
+            data={roots.map(json => JSON.parse(json))}
+          />
+        );
+      }
+    }
+  };
+}
+
 export default class LogWatcher extends PureComponent<Props, State> {
 
   state = {
     input: '',
     highlightedRow: null,
-    epPanelIsShown: false
+    epPanelIsShown: false,
+    jsonPanelIsShown: true,
   };
 
   _inputRef: ?HTMLInputElement;
@@ -330,8 +430,8 @@ export default class LogWatcher extends PureComponent<Props, State> {
             multiline={true}
             enableKeyboardNavigation={false}
           />
+
         </WatcherPanel>
-        }
         <WatcherPanel
           collapsed={true}
           heading="Message Details and Diagnostic Data"

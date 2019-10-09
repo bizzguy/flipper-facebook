@@ -58,7 +58,7 @@ export function filterLogMessage(log: string): boolean {
   if (log.tag.match('ConfigurationExtension')) include = true  // setting up the config
   if (log.message.match('Adobe Analytics')) include = true  // custom tag for footlocker Analytics
 
-  //if (log.tag.match('SurfaceFlinger'))  include = false
+  if (log.tag.match('MediaAnalyticsItem'))  include = false
   //if (log.tag.match('ActivityManager')) include = false
 
   return include;

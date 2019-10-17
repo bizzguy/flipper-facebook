@@ -15,7 +15,16 @@ import type {Counter} from './Airship.js';
 import type {NameValuePair} from './Airship.js';
 import type {DeviceLogEntry} from '../../devices/BaseDevice.js';
 import type {Props as PluginProps} from '../../plugin';
-import {formatDate, getPageName, trimStartEndChars, pad, getEntryType, getTestDataRow, filterLogMessage} from './utils.js';
+import {
+  formatDate,
+  getPageName,
+  trimStartEndChars,
+  pad,
+  getEntryType,
+  getTestDataRow,
+  filterLogMessage,
+  findJSON
+} from './utils.js';
 
 import {
   Text,
@@ -677,6 +686,10 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       this.state.contextData.push({name: param[0] , value: param[1] })
     }
     this.setState({contextData});
+
+    // assign any JSON data from message
+    const json = findJSON(message);
+    console.log(json)
 
     // assign additional data
     let additionalData = this.state.additionalData

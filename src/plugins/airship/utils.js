@@ -77,3 +77,32 @@ export function filterLogMessage(log: string): boolean {
   return include;
 }
 
+export function findJSON(textString: string): string {
+    console.log(textString)
+    var firstOpen, firstClose, candidate;
+    firstOpen = textString.indexOf('{', firstOpen + 1);
+    do {
+      firstClose = textString.lastIndexOf('}');
+      console.log('firstOpen: ' + firstOpen, 'firstClose: ' + firstClose);
+      if(firstClose <= firstOpen) {
+          return null;
+      }
+      do {
+          candidate = textString.substring(firstOpen, firstClose + 1);
+          console.log('candidate: ' + candidate);
+          try {
+              var res = JSON.parse(candidate);
+              console.log('...found');
+              //return [res, firstOpen, firstClose + 1];
+              return candidate;
+          }
+          catch(e) {
+              console.log('...failed');
+          }
+          firstClose = textString.substr(0, firstClose).lastIndexOf('}');
+      } while(firstClose > firstOpen);
+      firstOpen = textString.indexOf('{', firstOpen + 1);
+    } while(firstOpen != -1);
+    return null;
+}
+

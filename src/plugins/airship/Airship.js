@@ -296,8 +296,13 @@ export default class LogWatcher extends PureComponent<Props, State> {
             multiline={true}
             enableKeyboardNavigation={false}
           />
-        </WatcherPanel>
+        </WatcherPanel>,
         }
+        <Panel
+        heading={'Response Body'}
+        floating={false}
+        padded={!formattedText}>
+        </Panel>,
         <WatcherPanel
           collapsed={true}
           heading="Message Data"

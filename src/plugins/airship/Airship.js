@@ -8,6 +8,7 @@
 import type {TableBodyRow} from 'flipper';
 
 import {
+  Component,
   FlexRow,
   PureComponent,
   FlexColumn,
@@ -20,6 +21,9 @@ import {
   colors,
   styled,
 } from 'flipper';
+
+import {Request} from './types';
+import {decodeBody, getHeaderValue} from './utils';
 
 const ToolbarItem = styled(FlexRow)({
   alignItems: 'center',
@@ -271,6 +275,9 @@ export default class LogWatcher extends PureComponent<Props, State> {
 
   render() {
 
+    const formattedText = "ABC";
+    const data = JSON.parse('{"helloworld": "hello world 3"}');
+
     if (this.props.airshipData.length > 0) {
       this.state.airshipPanelIsShown = true
     } else {
@@ -296,13 +303,14 @@ export default class LogWatcher extends PureComponent<Props, State> {
             multiline={true}
             enableKeyboardNavigation={false}
           />
-        </WatcherPanel>,
+        </WatcherPanel>
         }
         <Panel
-        heading={'Response Body'}
-        floating={false}
-        padded={!formattedText}>
-        </Panel>,
+          heading={'JSON Data'}
+          floating={false}
+          padded={!formattedText}>
+          <JSONText>{data}</JSONText>
+        </Panel>
         <WatcherPanel
           collapsed={true}
           heading="Message Data"
@@ -322,6 +330,95 @@ export default class LogWatcher extends PureComponent<Props, State> {
           />
         </WatcherPanel>
       </FlexColumn>
+    );
+  }
+}
+
+class JSONTextFormatter {
+  formatRequest = (request: Request) => {
+    return this.format(
+      decodeBody(request),
+      getHeaderValue(request.headers, 'content-type'),
+    );
+  };
+
+  formatResponse = (request: Request, response: Response) => {
+    return this.format(
+      decodeBody(response),
+      getHeaderValue(response.headers, 'content-type'),
+    );
+  };
+
+  format = (body: string, contentType: string) => {
+    if (
+      contentType.startsWith('application/json') ||
+      contentType.startsWith('application/hal+json') ||
+      contentType.startsWith('text/javascript') ||
+      contentType.startsWith('application/x-fb-flatbuffer')
+    ) {
+      try {
+        const data = JSON.parse(body);
+        return <JSONText>{data}</JSONText>;
+      } catch (SyntaxError) {
+        // Multiple top level JSON roots, map them one by one
+        return body
+          .split('\n')
+          .map(json => JSON.parse(json))
+          .map(data => <JSONText>{data}</JSONText>);
+      }
+    }
+  };
+}
+
+const TextBodyFormatters: Array<BodyFormatter> = [new JSONTextFormatter()];
+
+const BodyContainer = styled('div')({
+  paddingTop: 10,
+  paddingBottom: 20,
+});
+
+class RequestBodyInspector extends Component<{
+  request: Request;
+  formattedText: boolean;
+}> {
+  render() {
+    const {request, formattedText} = this.props;
+    const bodyFormatters = formattedText ? TextBodyFormatters : BodyFormatters;
+    let component;
+    for (const formatter of bodyFormatters) {
+      if (formatter.formatRequest) {
+        try {
+          component = formatter.formatRequest(request);
+          if (component) {
+            break;
+          }
+        } catch (e) {
+          console.warn(
+            'BodyFormatter exception from ' + formatter.constructor.name,
+            e.message,
+          );
+        }
+      }
+    }
+
+    component = component || <Text>ABC</Text>;
+
+    return <BodyContainer>{component}</BodyContainer>;
+  }
+}
+
+class JSONText extends Component<{children: any}> {
+  static NoScrollbarText = styled(Text)({
+    overflowY: 'hidden',
+  });
+
+  render() {
+    const jsonObject = this.props.children;
+    return (
+      <JSONText.NoScrollbarText code whiteSpace="pre" selectable>
+        {JSON.stringify(jsonObject, null, 2)}
+        {'\n'}
+      </JSONText.NoScrollbarText>
     );
   }
 }

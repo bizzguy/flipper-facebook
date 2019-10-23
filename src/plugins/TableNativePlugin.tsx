@@ -478,7 +478,7 @@ export default function createTableNativePlugin(id: string, title: string) {
             multiHighlight={true}
             rows={this.applyMetadataToRows(rows)}
             stickyBottom={true}
-            actions={<Button onClick={this.clear}>Clear Table</Button>}
+            actions={<Button onClick={this.clear}>Clear Table dfddf dfdfdf dfdfdf dfdfdf </Button>}
           />
           <DetailSidebar>{this.renderSidebar()}</DetailSidebar>
           {bottomToolbarComponent}

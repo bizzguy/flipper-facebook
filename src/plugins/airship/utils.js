@@ -73,6 +73,7 @@ export function filterLogMessage(log: string): boolean {
 
   if (log.tag.match('SurfaceFlinger'))  include = false
   if (log.tag.match('ActivityManager')) include = false
+  if (log.tag.match('LeakCanary')) include = false
 
   return include;
 }

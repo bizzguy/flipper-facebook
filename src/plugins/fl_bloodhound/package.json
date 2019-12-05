@@ -1,0 +1,13 @@
+{
+  "name": "BloodHound",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {},
+  "title": "FL BloodHound",
+  "icon": "missing-icon",
+  "bugs": {
+    "email": "james.harmon@footlocker.com",
+    "url": ""
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "name": "Airship",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "keywords": [
+        "flipper-plugin"
+    ],
+    "dependencies": {},
+    "title": "FL Airship",
+    "icon": "missing-icon"
+}

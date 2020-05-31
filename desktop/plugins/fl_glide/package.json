@@ -10,6 +10,7 @@
   "keywords": [
     "flipper-plugin"
   ],
+  "icon": "apps",
   "title": "FL Glide",
   "bugs": {
     "email": "info@flipperguy.com"
@@ -19,10 +20,10 @@
     "prepack": "flipper-pkg lint && flipper-pkg bundle"
   },
   "peerDependencies": {
-    "flipper": "0.42.0"
+    "flipper": "0.44.0"
   },
   "devDependencies": {
-    "flipper": "0.42.0",
-    "flipper-pkg": "0.42.0"
+    "flipper": "0.44.0",
+    "flipper-pkg": "0.44.0"
   }
 }

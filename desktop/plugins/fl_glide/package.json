@@ -1,0 +1,28 @@
+{
+  "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
+  "name": "flipper-plugin-fl-glide",
+  "id": "fl-glide",
+  "private": true,
+  "version": "2.0.0",
+  "main": "index.tsx",
+  "flipperBundlerEntry": "src/index.tsx",
+  "license": "MIT",
+  "keywords": [
+    "flipper-plugin"
+  ],
+  "title": "FL Glide",
+  "bugs": {
+    "email": "info@flipperguy.com"
+  },
+  "scripts": {
+    "lint": "flipper-pkg lint",
+    "prepack": "flipper-pkg lint && flipper-pkg bundle"
+  },
+  "peerDependencies": {
+    "flipper": "0.42.0"
+  },
+  "devDependencies": {
+    "flipper": "0.42.0",
+    "flipper-pkg": "0.42.0"
+  }
+}

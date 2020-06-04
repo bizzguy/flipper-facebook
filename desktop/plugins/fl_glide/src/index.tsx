@@ -15,7 +15,7 @@ type Id = number;
 
 type Row = {
   id: Id;
-  title: string;
+  caching: string;
   url: string;
 };
 
@@ -75,7 +75,7 @@ export default class GlideImagePlugin extends FlipperPlugin<
 
     return (
       <GlideImagePlugin.Container>
-        {Object.entries(persistedState).map(([id, row]) => (
+        {Object.entries(persistedState).reverse().map(([id, row]) => (
           <Card
             {...row}
             onSelect={() => this.setState({ selectedID: id })}
@@ -106,16 +106,16 @@ class Card extends React.Component<
       ? colors.macOSTitleBarIconSelected
       : colors.white,
     padding: 0,
-    width: 150,
     overflow: 'hidden',
     boxShadow: '1px 1px 4px rgba(0,0,0,0.1)',
     cursor: 'pointer',
   }));
 
   static Image = styled.div({
-    backgroundSize: 'cover',
-    width: '100%',
+    backgroundSize: 'contain',
+    backgroundRepeat: 'no-repeat',
     paddingTop: '100%',
+    minWidth: '250px',
   });
 
   static Title = styled(Text)({
@@ -133,7 +133,7 @@ class Card extends React.Component<
         onClick={this.props.onSelect}
         selected={this.props.selected}>
         <Card.Image style={{ backgroundImage: `url(${this.props.url || ''})` }} />
-        <Card.Title>{this.props.title}</Card.Title>
+        <Card.Title>{this.props.caching}</Card.Title>
       </Card.Container>
     );
   }

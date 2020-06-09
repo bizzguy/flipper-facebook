@@ -7,9 +7,9 @@
  * @format
  */
 
-import {padStart} from 'lodash';
-import React, {createContext} from 'react';
-import {MenuItemConstructorOptions} from 'electron';
+import { padStart } from 'lodash';
+import React, { createContext } from 'react';
+import { MenuItemConstructorOptions } from 'electron';
 
 import {
   ContextMenu,
@@ -74,23 +74,23 @@ const COLUMN_SIZE = {
 };
 
 const COLUMN_ORDER = [
-  {key: 'requestTimestamp', visible: true},
-  {key: 'responseTimestamp', visible: false},
-  {key: 'domain', visible: true},
-  {key: 'method', visible: true},
-  {key: 'status', visible: true},
-  {key: 'size', visible: true},
-  {key: 'duration', visible: true},
+  { key: 'requestTimestamp', visible: true },
+  { key: 'responseTimestamp', visible: false },
+  { key: 'domain', visible: true },
+  { key: 'method', visible: true },
+  { key: 'status', visible: true },
+  { key: 'size', visible: true },
+  { key: 'duration', visible: true },
 ];
 
 const COLUMNS = {
-  requestTimestamp: {value: 'Request Time'},
-  responseTimestamp: {value: 'Response Time'},
-  domain: {value: 'Domain'},
-  method: {value: 'Method'},
-  status: {value: 'Status'},
-  size: {value: 'Size'},
-  duration: {value: 'Duration'},
+  requestTimestamp: { value: 'Request Time' },
+  responseTimestamp: { value: 'Response Time' },
+  domain: { value: 'Domain' },
+  method: { value: 'Method' },
+  status: { value: 'Status' },
+  size: { value: 'Size' },
+  duration: { value: 'Duration' },
 };
 
 const mockingStyle = {
@@ -436,12 +436,12 @@ export function plugin(client: PluginClient<Events, Methods>) {
             ...existedIdSet[route.requestUrl],
             [route.requestMethod]: true,
           };
-          return Object.assign({[id]: route}, accRoutes);
+          return Object.assign({ [id]: route }, accRoutes);
         } else {
           existedIdSet[route.requestUrl] = {
             [route.requestMethod]: true,
           };
-          return Object.assign({[id]: route}, accRoutes);
+          return Object.assign({ [id]: route }, accRoutes);
         }
       },
       {},
@@ -538,9 +538,9 @@ export function Component() {
 }
 
 type NetworkTableProps = {
-  requests: {[id: string]: Request};
-  responses: {[id: string]: Response};
-  routes: {[id: string]: Route};
+  requests: { [id: string]: Request };
+  responses: { [id: string]: Response };
+  routes: { [id: string]: Route };
   clear: () => void;
   copyRequestCurlCommand: () => void;
   onRowHighlighted: (keys: TableHighlightedRows) => void;
@@ -682,8 +682,8 @@ function buildRow(
 
 function calculateState(
   props: {
-    requests: {[id: string]: Request};
-    responses: {[id: string]: Response};
+    requests: { [id: string]: Request };
+    responses: { [id: string]: Response };
   },
   nextProps: NetworkTableProps,
   rows: TableRows = [],
@@ -776,7 +776,7 @@ class NetworkTable extends PureComponent<NetworkTableProps, NetworkTableState> {
 
   constructor(props: NetworkTableProps) {
     super(props);
-    this.state = calculateState({requests: {}, responses: {}}, props);
+    this.state = calculateState({ requests: {}, responses: {} }, props);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps: NetworkTableProps) {
@@ -791,18 +791,18 @@ class NetworkTable extends PureComponent<NetworkTableProps, NetworkTableState> {
       | 'checkbox'
       | 'radio';
     const separator: ContextMenuType = 'separator';
-    const {clear, copyRequestCurlCommand, highlightedRows} = this.props;
+    const { clear, copyRequestCurlCommand, highlightedRows } = this.props;
     const highlightedMenuItems =
       highlightedRows && highlightedRows.size === 1
         ? [
-            {
-              type: separator,
-            },
-            {
-              label: 'Copy as cURL',
-              click: copyRequestCurlCommand,
-            },
-          ]
+          {
+            type: separator,
+          },
+          {
+            label: 'Copy as cURL',
+            click: copyRequestCurlCommand,
+          },
+        ]
         : [];
 
     return highlightedMenuItems.concat([
@@ -880,7 +880,7 @@ class StatusColumn extends PureComponent<{
   children?: number;
 }> {
   render() {
-    const {children} = this.props;
+    const { children } = this.props;
     let glyph;
 
     if (children != null && children >= 400 && children < 600) {
@@ -907,7 +907,7 @@ class DurationColumn extends PureComponent<{
   });
 
   render() {
-    const {request, response} = this.props;
+    const { request, response } = this.props;
     const duration = response
       ? response.timestamp - request.timestamp
       : undefined;
@@ -929,7 +929,7 @@ class SizeColumn extends PureComponent<{
   });
 
   render() {
-    const {response} = this.props;
+    const { response } = this.props;
     if (response) {
       const text = formatBytes(this.getResponseLength(response));
       return <SizeColumn.Text>{text}</SizeColumn.Text>;

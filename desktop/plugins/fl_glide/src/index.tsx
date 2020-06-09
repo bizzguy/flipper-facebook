@@ -10,19 +10,20 @@ import {
   colors,
 } from 'flipper';
 import React from 'react';
+import { batch } from 'react-redux';
 
 type Id = number;
 
-type Row = {
+type Image = {
   id: Id;
   caching: string;
   url: string;
 };
 
-function renderSidebar(row: Row) {
+function renderSidebar(image: Image) {
   return (
     <Panel floating={false} heading={'Extras'}>
-      <ManagedDataInspector data={row} expandRoot={true} />
+      <ManagedDataInspector data={image} expandRoot={true} />
     </Panel>
   );
 }
@@ -31,26 +32,31 @@ type State = {
   selectedID: string | null;
 };
 
+type Entries = Array<{ image: Image }>;
+
 type PersistedState = {
-  [key: string]: Row;
+  images: { [id: string]: Image };
 };
 
-export default class GlideImagePlugin extends FlipperPlugin<
-  State,
-  any,
-  PersistedState
-  > {
-  static defaultPersistedState = {};
+export default class GlideImagePlugin extends FlipperPlugin<State, any, PersistedState> {
 
-  static persistedStateReducer<PersistedState>(
-    persistedState: PersistedState,
-    method: string,
-    payload: Row,
-  ) {
-    console.log('processing new image call')
+  static batchTimer: NodeJS.Timeout | undefined;
+
+  static batchImages: Image[] = [];
+  queued: boolean = false;
+  counter: number = 0;
+
+  //static defaultPersistedState = {};
+  static defaultPersistedState = {
+    images: {}
+  };
+
+  static persistedStateReducer(persistedState: PersistedState, method: string, payload: Image) {
     if (method === 'newImage') {
+      console.log('Recieved image id:' + payload.id + " for url: " + payload.url)
+      GlideImagePlugin.batchImages.push(payload);
       return Object.assign({}, persistedState, {
-        [payload.id]: payload,
+        images: { ...persistedState.images, [payload.id]: payload as Image },
       });
     }
     return persistedState;
@@ -69,24 +75,56 @@ export default class GlideImagePlugin extends FlipperPlugin<
     selectedID: null as string | null,
   };
 
+  componentDidMount() {
+    // need to make the initial call to getData() to populate
+    // data right away
+    //this.getData();
+
+    // Now we need to make it run at a specified interval
+    setInterval(this.getData, 20000); // runs every 200 milliseconds
+  }
+
+  componentWillUnmount() {
+    if (GlideImagePlugin.batchTimer) {
+      clearTimeout(GlideImagePlugin.batchTimer);
+    }
+  }
+
+  getData() {
+    console.log('running getData for: ' + GlideImagePlugin.batchImages.length);
+
+    //for (let i of GlideImagePlugin.batchImages) {
+    //  console.log(i.id);
+    //  console.log(i.url);
+    //}
+
+    //const { persistedState } = this.props;
+
+    //Object.entries(persistedState).map(([id, image]) => (
+    //  console.log(id)
+    //))
+  }
+
   render() {
     const { selectedID } = this.state;
     const { persistedState } = this.props;
 
     return (
-      <GlideImagePlugin.Container>
-        {Object.entries(persistedState).reverse().map(([id, row]) => (
-          <Card
-            {...row}
-            onSelect={() => this.setState({ selectedID: id })}
-            selected={id === selectedID}
-            key={id}
-          />
-        ))}
-        <DetailSidebar>
-          {selectedID && renderSidebar(persistedState[selectedID])}
+      < GlideImagePlugin.Container >
+        {
+          Object.entries(GlideImagePlugin.batchImages).reverse().map(([id, image]) => (
+            <Card
+              {...image}
+              onSelect={() => this.setState({ selectedID: id })}
+              selected={id === selectedID}
+              key={id}
+            />
+          ))
+        }
+        < DetailSidebar >
+          {selectedID && renderSidebar(GlideImagePlugin.batchImages[selectedID])}
         </DetailSidebar>
-      </GlideImagePlugin.Container>
+      </GlideImagePlugin.Container >
     );
   }
 }
@@ -95,7 +133,7 @@ class Card extends React.Component<
   {
     onSelect: () => void;
     selected: boolean;
-  } & Row
+  } & Image
   > {
   static Container = styled(FlexColumn)<{ selected?: boolean }>((props) => ({
     margin: 10,

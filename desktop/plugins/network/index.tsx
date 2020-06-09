@@ -7,9 +7,9 @@
  * @format
  */
 
-import {padStart} from 'lodash';
-import React, {createContext} from 'react';
-import {MenuItemConstructorOptions} from 'electron';
+import { padStart } from 'lodash';
+import React, { createContext } from 'react';
+import { MenuItemConstructorOptions } from 'electron';
 
 import {
   ContextMenu,
@@ -30,25 +30,25 @@ import {
   TableBodyRow,
   produce,
 } from 'flipper';
-import {Request, RequestId, Response, Route} from './types';
-import {convertRequestToCurlCommand, getHeaderValue, decodeBody} from './utils';
+import { Request, RequestId, Response, Route } from './types';
+import { convertRequestToCurlCommand, getHeaderValue, decodeBody } from './utils';
 import RequestDetails from './RequestDetails';
-import {clipboard} from 'electron';
-import {URL} from 'url';
-import {DefaultKeyboardAction} from 'app/src/MenuBar';
-import {MockResponseDialog} from './MockResponseDialog';
+import { clipboard } from 'electron';
+import { URL } from 'url';
+import { DefaultKeyboardAction } from 'app/src/MenuBar';
+import { MockResponseDialog } from './MockResponseDialog';
 
 const LOCALSTORAGE_MOCK_ROUTE_LIST_KEY = '__NETWORK_CACHED_MOCK_ROUTE_LIST';
 
 type PersistedState = {
-  requests: {[id: string]: Request};
-  responses: {[id: string]: Response};
+  requests: { [id: string]: Request };
+  responses: { [id: string]: Response };
 };
 
 type State = {
   selectedIds: Array<RequestId>;
   searchTerm: string;
-  routes: {[id: string]: Route};
+  routes: { [id: string]: Route };
   nextRouteId: number;
   isMockResponseSupported: boolean;
   showMockResponseDialog: boolean;
@@ -65,23 +65,23 @@ const COLUMN_SIZE = {
 };
 
 const COLUMN_ORDER = [
-  {key: 'requestTimestamp', visible: true},
-  {key: 'responseTimestamp', visible: false},
-  {key: 'domain', visible: true},
-  {key: 'method', visible: true},
-  {key: 'status', visible: true},
-  {key: 'size', visible: true},
-  {key: 'duration', visible: true},
+  { key: 'requestTimestamp', visible: true },
+  { key: 'responseTimestamp', visible: false },
+  { key: 'domain', visible: true },
+  { key: 'method', visible: true },
+  { key: 'status', visible: true },
+  { key: 'size', visible: true },
+  { key: 'duration', visible: true },
 ];
 
 const COLUMNS = {
-  requestTimestamp: {value: 'Request Time'},
-  responseTimestamp: {value: 'Response Time'},
-  domain: {value: 'Domain'},
-  method: {value: 'Method'},
-  status: {value: 'Status'},
-  size: {value: 'Size'},
-  duration: {value: 'Duration'},
+  requestTimestamp: { value: 'Request Time' },
+  responseTimestamp: { value: 'Response Time' },
+  domain: { value: 'Domain' },
+  method: { value: 'Method' },
+  status: { value: 'Status' },
+  size: { value: 'Size' },
+  duration: { value: 'Duration' },
 };
 
 const mockingStyle = {
@@ -115,9 +115,9 @@ export interface NetworkRouteManager {
   removeRoute(id: string): void;
 }
 const nullNetworkRouteManager: NetworkRouteManager = {
-  addRoute() {},
-  modifyRoute(_id: string, _routeChange: Partial<Route>) {},
-  removeRoute(_id: string) {},
+  addRoute() { },
+  modifyRoute(_id: string, _routeChange: Partial<Route>) { },
+  removeRoute(_id: string) { },
 };
 export const NetworkRouteContext = createContext<NetworkRouteManager>(
   nullNetworkRouteManager,
@@ -139,8 +139,8 @@ export default class extends FlipperPlugin<State, any, PersistedState> {
     ) {
       return previous + (values.status >= 400 ? 1 : 0);
     },
-    0);
-    return Promise.resolve({NUMBER_NETWORK_FAILURES: failures});
+      0);
+    return Promise.resolve({ NUMBER_NETWORK_FAILURES: failures });
   }
 
   static persistedStateReducer(
@@ -151,11 +151,11 @@ export default class extends FlipperPlugin<State, any, PersistedState> {
     switch (method) {
       case 'newRequest':
         return Object.assign({}, persistedState, {
-          requests: {...persistedState.requests, [data.id]: data as Request},
+          requests: { ...persistedState.requests, [data.id]: data as Request },
         });
       case 'newResponse':
         return Object.assign({}, persistedState, {
-          responses: {...persistedState.responses, [data.id]: data as Response},
+          responses: { ...persistedState.responses, [data.id]: data as Response },
         });
       default:
         return persistedState;
@@ -246,7 +246,7 @@ export default class extends FlipperPlugin<State, any, PersistedState> {
             if (!draftState.routes.hasOwnProperty(id)) {
               return;
             }
-            draftState.routes[id] = {...draftState.routes[id], ...routeChange};
+            draftState.routes[id] = { ...draftState.routes[id], ...routeChange };
             informClientMockChange(draftState.routes);
           }),
         );
@@ -294,11 +294,11 @@ export default class extends FlipperPlugin<State, any, PersistedState> {
   };
 
   onRowHighlighted = (selectedIds: Array<RequestId>) =>
-    this.setState({selectedIds});
+    this.setState({ selectedIds });
 
   copyRequestCurlCommand = () => {
-    const {requests} = this.props.persistedState;
-    const {selectedIds} = this.state;
+    const { requests } = this.props.persistedState;
+    const { selectedIds } = this.state;
     // Ensure there is only one row highlighted.
     if (selectedIds.length !== 1) {
       return;
@@ -313,13 +313,13 @@ export default class extends FlipperPlugin<State, any, PersistedState> {
   };
 
   clearLogs = () => {
-    this.setState({selectedIds: []});
-    this.props.setPersistedState({responses: {}, requests: {}});
+    this.setState({ selectedIds: [] });
+    this.props.setPersistedState({ responses: {}, requests: {} });
   };
 
-  informClientMockChange = (routes: {[id: string]: Route}) => {
-    const existedIdSet: {[id: string]: {[method: string]: boolean}} = {};
-    const filteredRoutes: {[id: string]: Route} = Object.entries(routes).reduce(
+  informClientMockChange = (routes: { [id: string]: Route }) => {
+    const existedIdSet: { [id: string]: { [method: string]: boolean } } = {};
+    const filteredRoutes: { [id: string]: Route } = Object.entries(routes).reduce(
       (accRoutes, [id, route]) => {
         if (existedIdSet.hasOwnProperty(route.requestUrl)) {
           if (
@@ -331,12 +331,12 @@ export default class extends FlipperPlugin<State, any, PersistedState> {
             ...existedIdSet[route.requestUrl],
             [route.requestMethod]: true,
           };
-          return Object.assign({[id]: route}, accRoutes);
+          return Object.assign({ [id]: route }, accRoutes);
         } else {
           existedIdSet[route.requestUrl] = {
             [route.requestMethod]: true,
           };
-          return Object.assign({[id]: route}, accRoutes);
+          return Object.assign({ [id]: route }, accRoutes);
         }
       },
       {},
@@ -360,16 +360,16 @@ export default class extends FlipperPlugin<State, any, PersistedState> {
   };
 
   onMockButtonPressed = () => {
-    this.setState({showMockResponseDialog: true});
+    this.setState({ showMockResponseDialog: true });
   };
 
   onCloseButtonPressed = () => {
-    this.setState({showMockResponseDialog: false});
+    this.setState({ showMockResponseDialog: false });
   };
 
   renderSidebar = () => {
-    const {requests, responses} = this.props.persistedState;
-    const {selectedIds} = this.state;
+    const { requests, responses } = this.props.persistedState;
+    const { selectedIds } = this.state;
     const selectedId = selectedIds.length === 1 ? selectedIds[0] : null;
 
     if (!selectedId) {
@@ -389,7 +389,7 @@ export default class extends FlipperPlugin<State, any, PersistedState> {
   };
 
   render() {
-    const {requests, responses} = this.props.persistedState;
+    const { requests, responses } = this.props.persistedState;
     const {
       selectedIds,
       searchTerm,
@@ -423,9 +423,9 @@ export default class extends FlipperPlugin<State, any, PersistedState> {
 }
 
 type NetworkTableProps = {
-  requests: {[id: string]: Request};
-  responses: {[id: string]: Response};
-  routes: {[id: string]: Route};
+  requests: { [id: string]: Request };
+  responses: { [id: string]: Response };
+  routes: { [id: string]: Route };
   clear: () => void;
   copyRequestCurlCommand: () => void;
   onRowHighlighted: (keys: TableHighlightedRows) => void;
@@ -439,7 +439,7 @@ type NetworkTableProps = {
 
 type NetworkTableState = {
   sortedRows: TableRows;
-  routes: {[id: string]: Route};
+  routes: { [id: string]: Route };
 };
 
 function formatTimestamp(timestamp: number): string {
@@ -475,11 +475,11 @@ function buildRow(
 ## Request
 HTTP ${request.method} ${request.url}
 ${request.headers
-  .map(
-    ({key, value}: {key: string; value: string}): string =>
-      `${key}: ${String(value)}`,
-  )
-  .join('\n')}`;
+      .map(
+        ({ key, value }: { key: string; value: string }): string =>
+          `${key}: ${String(value)}`,
+      )
+      .join('\n')}`;
 
   const requestData = request.data ? decodeBody(request) : null;
   const responseData = response && response.data ? decodeBody(response) : null;
@@ -494,11 +494,11 @@ ${request.headers
 ## Response
 HTTP ${response.status} ${response.reason}
 ${response.headers
-  .map(
-    ({key, value}: {key: string; value: string}): string =>
-      `${key}: ${String(value)}`,
-  )
-  .join('\n')}`;
+        .map(
+          ({ key, value }: { key: string; value: string }): string =>
+            `${key}: ${String(value)}`,
+        )
+        .join('\n')}`;
   }
 
   if (responseData) {
@@ -555,8 +555,8 @@ ${response.headers
 
 function calculateState(
   props: {
-    requests: {[id: string]: Request};
-    responses: {[id: string]: Response};
+    requests: { [id: string]: Request };
+    responses: { [id: string]: Response };
   },
   nextProps: NetworkTableProps,
   rows: TableRows = [],
@@ -612,7 +612,7 @@ class NetworkTable extends PureComponent<NetworkTableProps, NetworkTableState> {
 
   constructor(props: NetworkTableProps) {
     super(props);
-    this.state = calculateState({requests: {}, responses: {}}, props);
+    this.state = calculateState({ requests: {}, responses: {} }, props);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps: NetworkTableProps) {
@@ -627,18 +627,18 @@ class NetworkTable extends PureComponent<NetworkTableProps, NetworkTableState> {
       | 'checkbox'
       | 'radio';
     const separator: ContextMenuType = 'separator';
-    const {clear, copyRequestCurlCommand, highlightedRows} = this.props;
+    const { clear, copyRequestCurlCommand, highlightedRows } = this.props;
     const highlightedMenuItems =
       highlightedRows && highlightedRows.size === 1
         ? [
-            {
-              type: separator,
-            },
-            {
-              label: 'Copy as cURL',
-              click: copyRequestCurlCommand,
-            },
-          ]
+          {
+            type: separator,
+          },
+          {
+            label: 'Copy as cURL',
+            click: copyRequestCurlCommand,
+          },
+        ]
         : [];
 
     return highlightedMenuItems.concat([
@@ -713,7 +713,7 @@ class StatusColumn extends PureComponent<{
   children?: number;
 }> {
   render() {
-    const {children} = this.props;
+    const { children } = this.props;
     let glyph;
 
     if (children != null && children >= 400 && children < 600) {
@@ -740,7 +740,7 @@ class DurationColumn extends PureComponent<{
   });
 
   render() {
-    const {request, response} = this.props;
+    const { request, response } = this.props;
     const duration = response
       ? response.timestamp - request.timestamp
       : undefined;
@@ -762,7 +762,7 @@ class SizeColumn extends PureComponent<{
   });
 
   render() {
-    const {response} = this.props;
+    const { response } = this.props;
     if (response) {
       const text = formatBytes(this.getResponseLength(response));
       return <SizeColumn.Text>{text}</SizeColumn.Text>;

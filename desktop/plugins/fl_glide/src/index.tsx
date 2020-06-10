@@ -10,7 +10,6 @@ import {
   colors,
 } from 'flipper';
 import React from 'react';
-import { batch } from 'react-redux';
 
 type Id = number;
 
@@ -18,6 +17,14 @@ type Image = {
   id: Id;
   caching: string;
   url: string;
+  view_id: string;
+};
+
+type Notification = {
+  id: Id;
+  message: string;
+  url: string;
+  view_id: string;
 };
 
 function renderSidebar(image: Image) {
@@ -36,6 +43,7 @@ type Entries = Array<{ image: Image }>;
 
 type PersistedState = {
   images: { [id: string]: Image };
+  currentNotifications: { [id: string]: Notification };
 };
 
 export default class GlideImagePlugin extends FlipperPlugin<State, any, PersistedState> {
@@ -48,15 +56,22 @@ export default class GlideImagePlugin extends FlipperPlugin<State, any, Persiste
 
   //static defaultPersistedState = {};
   static defaultPersistedState = {
-    images: {}
+    images: {},
+    currentNotifications: {}
   };
 
-  static persistedStateReducer(persistedState: PersistedState, method: string, payload: Image) {
+  static persistedStateReducer(persistedState: PersistedState, method: string, payload: Image | Notification) {
     if (method === 'newImage') {
       console.log('Recieved image id:' + payload.id + " for url: " + payload.url)
-      GlideImagePlugin.batchImages.push(payload);
+      GlideImagePlugin.batchImages.push(payload as Image);
       return Object.assign({}, persistedState, {
         images: { ...persistedState.images, [payload.id]: payload as Image },
+      });
+    }
+    if (method === 'newError') {
+      console.log('Recieved new error id:' + payload.id)
+      return Object.assign({}, persistedState, {
+        currentNotifications: { ...persistedState.currentNotifications, [payload.id]: payload as Notification },
       });
     }
     return persistedState;
@@ -75,34 +90,21 @@ export default class GlideImagePlugin extends FlipperPlugin<State, any, Persiste
     selectedID: null as string | null,
   };
 
-  componentDidMount() {
-    // need to make the initial call to getData() to populate
-    // data right away
-    //this.getData();
-
-    // Now we need to make it run at a specified interval
-    setInterval(this.getData, 20000); // runs every 200 milliseconds
-  }
-
-  componentWillUnmount() {
-    if (GlideImagePlugin.batchTimer) {
-      clearTimeout(GlideImagePlugin.batchTimer);
-    }
-  }
-
-  getData() {
-    console.log('running getData for: ' + GlideImagePlugin.batchImages.length);
-
-    //for (let i of GlideImagePlugin.batchImages) {
-    //  console.log(i.id);
-    //  console.log(i.url);
-    //}
-
-    //const { persistedState } = this.props;
-
-    //Object.entries(persistedState).map(([id, image]) => (
-    //  console.log(id)
-    //))
+  /*
+   * Callback to provide the currently active notifications.
+   */
+  static getActiveNotifications(persistedState: PersistedState) {
+    return Object.entries(persistedState.currentNotifications).map(([id, notification]) => {
+      const viewMessage = "View id: " + notification.view_id;
+      const urlMessage = "(Url: " + notification.url + ')';
+      return {
+        id: 'error-notification:' + id,
+        message: viewMessage,
+        severity: 'error' as 'error',
+        title: 'GlideException: ' + notification.message + ' ' + urlMessage,
+        action: ''
+      };
+    });
   }
 
   render() {
@@ -170,7 +172,7 @@ class Card extends React.Component<
       <Card.Container
         onClick={this.props.onSelect}
         selected={this.props.selected}>
-        <Card.Image style={{ backgroundImage: `url(${this.props.url || ''})` }} />
+        <Card.Image style={{ backgroundImage: `url(${encodeURI(this.props.url) || ''})` }} />
         <Card.Title>{this.props.caching}</Card.Title>
       </Card.Container>
     );

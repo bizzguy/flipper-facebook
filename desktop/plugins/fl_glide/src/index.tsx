@@ -8,6 +8,7 @@ import {
   FlexColumn,
   styled,
   colors,
+  ContextMenu,
 } from 'flipper';
 import React from 'react';
 
@@ -46,6 +47,13 @@ type PersistedState = {
   currentNotifications: { [id: string]: Notification };
 };
 
+const Content = styled(FlexColumn)({
+  padding: '0 10px',
+  backgroundColor: colors.light02,
+  overflow: 'scroll',
+  flexGrow: 1,
+});
+
 export default class GlideImagePlugin extends FlipperPlugin<State, any, PersistedState> {
 
   static batchTimer: NodeJS.Timeout | undefined;
@@ -53,6 +61,8 @@ export default class GlideImagePlugin extends FlipperPlugin<State, any, Persiste
   static batchImages: Image[] = [];
   queued: boolean = false;
   counter: number = 0;
+
+  contextMenuItems = [{ label: 'Clear all' }];
 
   //static defaultPersistedState = {};
   static defaultPersistedState = {
@@ -112,21 +122,23 @@ export default class GlideImagePlugin extends FlipperPlugin<State, any, Persiste
     const { persistedState } = this.props;
 
     return (
-      < GlideImagePlugin.Container >
-        {
-          Object.entries(GlideImagePlugin.batchImages).reverse().map(([id, image]) => (
-            <Card
-              {...image}
-              onSelect={() => this.setState({ selectedID: id })}
-              selected={id === selectedID}
-              key={id}
-            />
-          ))
-        }
-        < DetailSidebar >
-          {selectedID && renderSidebar(GlideImagePlugin.batchImages[selectedID])}
-        </DetailSidebar>
-      </GlideImagePlugin.Container >
+      <ContextMenu items={this.contextMenuItems} component={Content}>
+        < GlideImagePlugin.Container >
+          {
+            Object.entries(GlideImagePlugin.batchImages).reverse().map(([id, image]) => (
+              <Card
+                {...image}
+                onSelect={() => this.setState({ selectedID: id })}
+                selected={id === selectedID}
+                key={id}
+              />
+            ))
+          }
+          < DetailSidebar >
+            {selectedID && renderSidebar(GlideImagePlugin.batchImages[selectedID])}
+          </DetailSidebar>
+        </GlideImagePlugin.Container >
+      </ContextMenu>
     );
   }
 }

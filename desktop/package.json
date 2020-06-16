@@ -261,5 +261,6 @@
   },
   "optionalDependencies": {
     "7zip-bin-mac": "^1.0.1"
-  }
+  },
+  "dependencies": {}
 }

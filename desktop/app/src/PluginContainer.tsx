@@ -180,7 +180,7 @@ class PluginContainer extends PureComponent<Props, State> {
     this.processMessageQueue();
     // make sure deeplinks are propagated
     const {deepLinkPayload, target, activePlugin} = this.props;
-    if (deepLinkPayload && target instanceof Client && activePlugin) {
+    if (deepLinkPayload && activePlugin && target) {
       target.sandyPluginStates
         .get(activePlugin.id)
         ?.triggerDeepLink(deepLinkPayload);
@@ -248,7 +248,6 @@ class PluginContainer extends PureComponent<Props, State> {
       pluginIsEnabled,
     } = this.props;
     if (!activePlugin || !target || !pluginKey) {
-      console.warn(`No selected plugin. Rendering empty!`);
       return null;
     }
 
@@ -343,18 +342,13 @@ class PluginContainer extends PureComponent<Props, State> {
     }
     let pluginElement: null | React.ReactElement<any>;
     if (isSandyPlugin(activePlugin)) {
-      if (target instanceof Client) {
-        // Make sure we throw away the container for different pluginKey!
-        pluginElement = (
-          <SandyPluginRenderer
-            key={pluginKey}
-            plugin={target.sandyPluginStates.get(activePlugin.id)!}
-          />
-        );
-      } else {
-        // TODO: target might be a device as well, support that T68738317
-        pluginElement = null;
-      }
+      // Make sure we throw away the container for different pluginKey!
+      pluginElement = (
+        <SandyPluginRenderer
+          key={pluginKey}
+          plugin={target.sandyPluginStates.get(activePlugin.id)!}
+        />
+      );
     } else {
       const props: PluginProps<Object> & {
         key: string;

@@ -44,11 +44,7 @@ export {getPluginKey, getPersistedState} from './utils/pluginUtils';
 export {Idler} from './utils/Idler';
 export {Store, MiddlewareAPI, State as ReduxState} from './reducers/index';
 export {default as BaseDevice} from './devices/BaseDevice';
-export {
-  DeviceLogListener,
-  DeviceLogEntry,
-  LogLevel,
-} from './devices/BaseDevice';
+export {DeviceLogEntry, LogLevel, DeviceLogListener} from 'flipper-plugin';
 export {shouldParseAndroidLog} from './utils/crashReporterUtility';
 export {default as isProduction} from './utils/isProduction';
 export {createTablePlugin} from './createTablePlugin';
@@ -120,7 +116,10 @@ export {default as Orderable} from './ui/components/Orderable';
 export {default as VirtualList} from './ui/components/VirtualList';
 export {Component, PureComponent} from 'react';
 export {default as ContextMenuProvider} from './ui/components/ContextMenuProvider';
-export {default as ContextMenu} from './ui/components/ContextMenu';
+export {
+  default as ContextMenu,
+  MenuTemplate,
+} from './ui/components/ContextMenu';
 export {FileListFile, FileListFiles} from './ui/components/FileList';
 export {default as FileList} from './ui/components/FileList';
 export {default as File} from './ui/components/File';

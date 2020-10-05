@@ -11,10 +11,10 @@ import type {
   TableColumnSizes,
   TableColumns
 } from 'flipper';
-import type {Counter} from './Airship.js';
-import type {NameValuePair} from './Airship.js';
-import type {DeviceLogEntry} from '../../devices/BaseDevice.js';
-import type {Props as PluginProps} from '../../plugin';
+import type { Counter } from './Airship.js';
+import type { NameValuePair } from './Airship.js';
+import type { DeviceLogEntry } from '../../devices/BaseDevice.js';
+import type { Props as PluginProps } from '../../plugin';
 import {
   formatDate,
   getPageName,
@@ -53,15 +53,15 @@ type Entries = Array<{
 }>;
 
 type State = {|
-  rows: Array<TableBodyRow>,
-  entries: Entries,
-  key2entry: {[key: string]: DeviceLogEntry},
-  highlightedRows: Set<string>,
-  counters: Array<Counter>,
-  additionalData: Array<NameValuePair>,
-  contextData: Array<NameValuePair>,
-  airshipData: Array<NameValuePair>,
-  hitData: Array<NameValuePair>
+  rows: Array < TableBodyRow >,
+    entries: Entries,
+      key2entry: { [key: string]: DeviceLogEntry },
+highlightedRows: Set < string >,
+  counters: Array < Counter >,
+    additionalData: Array < NameValuePair >,
+      contextData: Array < NameValuePair >,
+        airshipData: Array < NameValuePair >,
+          hitData: Array<NameValuePair>
 |};
 
 type Actions = {||};
@@ -180,7 +180,7 @@ const HiddenScrollText = styled(Text)({
   },
 });
 
-const LogCount = styled('div')(({backgroundColor}) => ({
+const LogCount = styled('div')(({ backgroundColor }) => ({
   backgroundColor,
   borderRadius: '999em',
   fontSize: 11,
@@ -207,11 +207,11 @@ export function addEntriesToState(
 ): $Shape<State> {
   const rows = [...state.rows];
   const entries = [...state.entries];
-  const key2entry = {...state.key2entry};
+  const key2entry = { ...state.key2entry };
 
   for (let i = 0; i < items.length; i++) {
-    const {entry, row} = items[i];
-    entries.push({row, entry});
+    const { entry, row } = items[i];
+    entries.push({ row, entry });
     key2entry[row.key] = entry;
 
     let previousEntry: ?DeviceLogEntry = null;
@@ -238,58 +238,58 @@ export function addRowIfNeeded(
   entry: DeviceLogEntry,
   previousEntry: ?DeviceLogEntry,
 ) {
-    rows.unshift(row);
+  rows.unshift(row);
 }
 
 function getContextData(textString: string): Array<string> {
 
-    try {
-        var trimmedString = trimStartEndChars(textString)
-        var decodedTrimmedString = decodeURIComponent(trimmedString);
-        var params = decodedTrimmedString.split("&");
+  try {
+    var trimmedString = trimStartEndChars(textString)
+    var decodedTrimmedString = decodeURIComponent(trimmedString);
+    var params = decodedTrimmedString.split("&");
 
-        let newParams = []
+    let newParams = []
 
-        let inC = false
-        let inA = false
+    let inC = false
+    let inA = false
 
-        for (const param of params){
-            if (param == "c.") {
-                inC = true
-                continue
-            }
-            if (param == "a.") {
-                inA = true
-                continue
-            }
-            if (param == ".c") {
-                inC = false
-                continue
-            }
-            if (param == ".a") {
-                inA = false
-                continue
-            }
+    for (const param of params) {
+      if (param == "c.") {
+        inC = true
+        continue
+      }
+      if (param == "a.") {
+        inA = true
+        continue
+      }
+      if (param == ".c") {
+        inC = false
+        continue
+      }
+      if (param == ".a") {
+        inA = false
+        continue
+      }
 
-            if (inA) {
-              let newParam = 'a.' + param
-              newParams.push(newParam)
-              continue
-            }
-            if (inC) {
-              newParams.push(param)
-              continue
-            }
+      if (inA) {
+        let newParam = 'a.' + param
+        newParams.push(newParam)
+        continue
+      }
+      if (inC) {
+        newParams.push(param)
+        continue
+      }
 
-        }
-
-        newParams .sort((a, b) => (a.toLowerCase() > b.toLowerCase()) ? 1 : -1)
-
-        return newParams;
-
-    } catch (err) {
-        return []
     }
+
+    newParams.sort((a, b) => (a.toLowerCase() > b.toLowerCase()) ? 1 : -1)
+
+    return newParams;
+
+  } catch (err) {
+    return []
+  }
 }
 
 function getAdditionalData(textString: string): Array<string> {
@@ -300,7 +300,7 @@ function getAdditionalData(textString: string): Array<string> {
 
   let inC = false
 
-  for (const param of params){
+  for (const param of params) {
     if (param == "c.") {
       inC = true
       continue
@@ -311,8 +311,8 @@ function getAdditionalData(textString: string): Array<string> {
     }
 
     if (!inC) {
-        newParams.push(param)
-        continue
+      newParams.push(param)
+      continue
     }
   }
   newParams.sort()
@@ -327,19 +327,19 @@ function getHitData(textString: string, row): Array<NameValuePair> {
 
   const formattedDate = formatDate(row.entry.date)
 
-  newHitData.push({name: 'Time' , value: formattedDate })
+  newHitData.push({ name: 'Time', value: formattedDate })
 
   const unformattedTime = String(row.entry.date)
-  newHitData.push({name: 'Unformatted Date' , value: unformattedTime })
+  newHitData.push({ name: 'Unformatted Date', value: unformattedTime })
 
   const tag = String(row.entry.tag)
-  newHitData.push({name: 'Tag' , value: tag })
+  newHitData.push({ name: 'Tag', value: tag })
 
   const pid = String(row.entry.pid)
-  newHitData.push({name: 'PID' , value: pid })
+  newHitData.push({ name: 'PID', value: pid })
 
   const message = String(row.entry.message)
-  newHitData.push({name: 'Message' , value: message })
+  newHitData.push({ name: 'Message', value: message })
 
   return newHitData;
 }
@@ -347,8 +347,8 @@ function getHitData(textString: string, row): Array<NameValuePair> {
 let testDataRowNumber = 0;
 let testDataRowNumberMax = 11
 
-export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBodyRow, entry: DeviceLogEntry} {
-    // build the item, it will either be batched or added straight awa
+export function processEntry(entry: DeviceLogEntry, key: string): { row: TableBodyRow, entry: DeviceLogEntry } {
+  // build the item, it will either be batched or added straight awa
 
   testDataRowNumber++
   //if (testDataRowNumber <= testDataRowNumberMax) {
@@ -361,7 +361,7 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
 
   // override pageName if there is an a.action attribute
   let newContextData = getContextData(entry.message)
-  for (const newContextDataElement of newContextData){
+  for (const newContextDataElement of newContextData) {
     let paramName = String(newContextDataElement)
     let param = paramName.split("=")
     if (param[0] == 'a.action') {
@@ -377,7 +377,7 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
   const formattedDate = formatDate(entry.date)
 
   const entryType = getEntryType(entry.message)
-  const {icon, style} = LOG_TYPES[entryType]
+  const { icon, style } = LOG_TYPES[entryType]
 
   return {
     row: {
@@ -427,7 +427,7 @@ export function processEntry(entry: DeviceLogEntry, key: string): {row: TableBod
   };
 }
 
-export default class LogTable extends FlipperDevicePlugin <State, Actions,PersistedState,> {
+export default class LogTable extends FlipperDevicePlugin<State, Actions, PersistedState,> {
   static keyboardActions = ['clear', 'goToBottom', 'createPaste'];
 
   initTimer: ?TimeoutID;
@@ -507,14 +507,6 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
   constructor(props: PluginProps<PersistedState>) {
     super(props);
 
-    const supportedColumns = this.device.supportedColumns();
-
-    this.columns = keepKeys(COLUMNS, supportedColumns);
-    this.columnSizes = keepKeys(COLUMN_SIZE, supportedColumns);
-    this.columnOrder = INITIAL_COLUMN_ORDER.filter(obj =>
-      supportedColumns.includes(obj.key),
-    );
-
     this.columns = COLUMNS
     this.columnSizes = COLUMN_SIZE
     this.columnOrder = INITIAL_COLUMN_ORDER
@@ -567,7 +559,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
       }
     });
     if (counterUpdated) {
-      this.setState({counters});
+      this.setState({ counters });
     }
   };
 
@@ -668,24 +660,24 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
 
     const counters = this.state.counters
     this.state.counters[0] = newCounter
-    this.setState({counters});
+    this.setState({ counters });
 
     // assign context data
     let contextData = this.state.contextData
 
     while (contextData.length) {
-        contextData.pop();
+      contextData.pop();
     }
 
     let message = currentEntry.message
 
     let newContextData = getContextData(message)
-    for (const newContextDataElement of newContextData){
+    for (const newContextDataElement of newContextData) {
       let paramName = String(newContextDataElement)
       let param = paramName.split("=")
-      this.state.contextData.push({name: param[0] , value: param[1] })
+      this.state.contextData.push({ name: param[0], value: param[1] })
     }
-    this.setState({contextData});
+    this.setState({ contextData });
 
     // assign any JSON data from message
     const json = findJSON(message);
@@ -696,64 +688,64 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
     let airshipData = this.state.airshipData
 
     while (additionalData.length) {
-        additionalData.pop();
+      additionalData.pop();
     }
     while (airshipData.length) {
-        airshipData.pop();
+      airshipData.pop();
     }
 
     let newAdditionalData = getAdditionalData(message)
-    for (const newAdditionalDataElement of newAdditionalData){
+    for (const newAdditionalDataElement of newAdditionalData) {
       let paramName = String(newAdditionalDataElement)
       let param = paramName.split("=")
       if (param[0] == 'events') {
         console.log('found events')
         // test
         //param[1] = "ScmE,ScmE2"
-        this.state.airshipData.push({name: param[0] , value: param[1] })
-                try {
-                    // parse products
-                    let eventNbr = 1
-                    const events = param[1].split(',')
-                    for (const event of events){
-                        this.state.airshipData.push({name: '  event ' + eventNbr , value: event })
-                        eventNbr++
-                    }
-                } catch (err) {
-                  this.state.airshipData.push({name: '' , value: '*** Parsing Error ***' })
-                }
+        this.state.airshipData.push({ name: param[0], value: param[1] })
+        try {
+          // parse products
+          let eventNbr = 1
+          const events = param[1].split(',')
+          for (const event of events) {
+            this.state.airshipData.push({ name: '  event ' + eventNbr, value: event })
+            eventNbr++
+          }
+        } catch (err) {
+          this.state.airshipData.push({ name: '', value: '*** Parsing Error ***' })
+        }
       } else if (param[0] == 'products') {
         console.log('found products')
         // test
         //param[1] = ";EG8101;3;180.0,;XEG8102;6;360.0"
-        this.state.airshipData.push({name: param[0] , value: param[1] })
+        this.state.airshipData.push({ name: param[0], value: param[1] })
         try {
-            // parse products
-            let productNbr = 1
-            const products = param[1].split(',')
-            for (const product of products){
-                this.state.airshipData.push({name: '  product ' + productNbr , value: product })
-                const productAttrs = product.split(';')
-                console.log("productAttrs")
-                console.log(productAttrs)
-                this.state.airshipData.push({name: '    sku' , value: '  ' + productAttrs[1] })
-                this.state.airshipData.push({name: '    qty' , value: '  ' + productAttrs[2] })
-                this.state.airshipData.push({name: '    price' , value: '  ' + productAttrs[3] })
-                productNbr++
-            }
+          // parse products
+          let productNbr = 1
+          const products = param[1].split(',')
+          for (const product of products) {
+            this.state.airshipData.push({ name: '  product ' + productNbr, value: product })
+            const productAttrs = product.split(';')
+            console.log("productAttrs")
+            console.log(productAttrs)
+            this.state.airshipData.push({ name: '    sku', value: '  ' + productAttrs[1] })
+            this.state.airshipData.push({ name: '    qty', value: '  ' + productAttrs[2] })
+            this.state.airshipData.push({ name: '    price', value: '  ' + productAttrs[3] })
+            productNbr++
+          }
         } catch (err) {
-          this.state.airshipData.push({name: '' , value: '*** Parsing Error ***' })
+          this.state.airshipData.push({ name: '', value: '*** Parsing Error ***' })
         }
       } else {
-        this.state.additionalData.push({name: param[0] , value: param[1] })
+        this.state.additionalData.push({ name: param[0], value: param[1] })
       }
     }
-    this.setState({additionalData});
-    this.setState({airshipData});
+    this.setState({ additionalData });
+    this.setState({ airshipData });
 
     // assign hit data
     let hitData = getHitData(message, currentRow)
-    this.setState({hitData})
+    this.setState({ hitData })
 
     console.log('...running onRowHighlighted - end')
   };
@@ -768,7 +760,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         hitData={this.state.hitData}
         airshipData={this.state.airshipData}
         onChange={contextData =>
-          this.setState({contextData}, () =>
+          this.setState({ contextData }, () =>
             window.localStorage.setItem(
               LOG_WATCHER_LOCAL_STORAGE_KEY,
               JSON.stringify(this.state.contextData),
@@ -799,7 +791,7 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
         buildItems={this.buildContextMenuItems}
         component={FlexColumn}>
         <SearchableTable
-           width={310}
+          width={310}
           innerRef={this.setTableRef}
           floating={false}
           multiline={true}

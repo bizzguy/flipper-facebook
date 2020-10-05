@@ -505,14 +505,6 @@ export default class LogTable extends FlipperDevicePlugin <State, Actions,Persis
   constructor(props: PluginProps<PersistedState>) {
     super(props);
 
-    const supportedColumns = this.device.supportedColumns();
-
-    this.columns = keepKeys(COLUMNS, supportedColumns);
-    this.columnSizes = keepKeys(COLUMN_SIZE, supportedColumns);
-    this.columnOrder = INITIAL_COLUMN_ORDER.filter(obj =>
-      supportedColumns.includes(obj.key),
-    );
-
     this.columns = COLUMNS
     this.columnSizes = COLUMN_SIZE
     this.columnOrder = INITIAL_COLUMN_ORDER

@@ -27,7 +27,7 @@ type Events = {
   newRow: DataRow;
 };
 
-const style = { background: '#ffffff', padding: '6px 0' };
+const style = { background: '#ffffff', padding: '8px 8' };
 const textStyle = { background: '#ffffff', padding: '6px 0' };
 
 function createRow(event: DataRow) {
@@ -83,19 +83,6 @@ export function Component() {
   return (
     <Layout.Container grow>
       <Layout.Container gap>
-        <Row gutter={8}>
-          <Col className="gutter-row" span={4}>
-            <div style={textStyle}>
-            Talk Back
-            </div>
-          </Col>
-          <Col className="gutter-row" span={16}>
-            <div style={style}>
-              <Button type="primary" onClick={instance.talkbackOn}>Talkback On</Button>
-              <Button type="primary" onClick={instance.talkbackOff}>Talkback Off</Button>
-            </div>
-          </Col>
-        </Row>
         <Row gutter={8}>
           <Col className="gutter-row" span={4}>
             <div style={textStyle}>

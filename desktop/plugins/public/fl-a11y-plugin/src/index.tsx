@@ -6,6 +6,7 @@ import {
   DataTable,
   DataTableColumn, 
   Layout, 
+  Panel,
   PluginClient,
   usePlugin,
 } from 'flipper-plugin';
@@ -13,7 +14,9 @@ import {
 import {
   Button,
   Col, 
-  Row
+  Divider,
+  Row,
+  Space,
 } from 'antd'
 
 type DataRow = {
@@ -82,7 +85,8 @@ export function Component() {
   const instance = usePlugin(plugin);
   return (
     <Layout.Container grow>
-      <Layout.Container gap>
+      <Panel title='Device Commands'>
+      <Layout.Container gap grow>
         <Row gutter={8}>
           <Col className="gutter-row" span={4}>
             <div style={{marginLeft: 15, marginRight: 5}}>
@@ -97,6 +101,23 @@ export function Component() {
           </Col>
         </Row>
       </Layout.Container>
+      <Layout.Container gap grow>
+        <Row gutter={8}>
+          <Col className="gutter-row" span={4}>
+            <div style={{marginLeft: 15, marginRight: 5}}>
+            Talk Back
+            </div>
+          </Col>
+          <Col className="gutter-row" span={16}>
+            <Space align='center'>
+              <Button type="primary" onClick={instance.talkbackOn}>Talkback On</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 5, marginRight: 5}}>Talkback Off</Button>
+            </Space>
+          </Col>
+        </Row>
+      </Layout.Container>
+      </Panel>
+
       <Layout.Container grow>
           <DataTable<DataRow>
               dataSource={instance.rows}

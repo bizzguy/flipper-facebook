@@ -31,7 +31,7 @@ type Events = {
 };
 
 const style = { background: '#ffffff', padding: '8px 8' };
-const textStyle = { background: '#ffffff', padding: '6px 0' };
+const textStyle = { background: '#ffffff', padding: '12px'};
 
 function createRow(event: DataRow) {
   return {
@@ -86,37 +86,61 @@ export function Component() {
   return (
     <Layout.Container grow>
       <Panel title='Device Commands'>
-      <Layout.Container gap grow>
+
+      <Layout.Container grow>
         <Row gutter={8}>
-          <Col className="gutter-row" span={4}>
-            <div style={{marginLeft: 15, marginRight: 5}}>
+          <Col className="gutter-row" span={8}>
+            <div style={textStyle}>
             Talk Back
             </div>
           </Col>
           <Col className="gutter-row" span={16}>
-            <div style={{marginLeft: 5, marginRight: 5}}>
+            <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
               <Button type="primary" onClick={instance.talkbackOn}>Talkback On</Button>
-              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 5, marginRight: 5}}>Talkback Off</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Talkback Off</Button>
             </div>
           </Col>
         </Row>
       </Layout.Container>
-      <Layout.Container gap grow>
+
+      <Layout.Container grow>
         <Row gutter={8}>
-          <Col className="gutter-row" span={4}>
-            <div style={{marginLeft: 15, marginRight: 5}}>
-            Talk Back
+          <Col className="gutter-row" span={8}>
+            <div style={textStyle}>
+            Screen Recording
             </div>
           </Col>
           <Col className="gutter-row" span={16}>
-            <Space align='center'>
-              <Button type="primary" onClick={instance.talkbackOn}>Talkback On</Button>
-              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 5, marginRight: 5}}>Talkback Off</Button>
-            </Space>
+            <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
+              <Button type="primary" onClick={instance.talkbackOn}>Start Recording</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Pause</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Resume</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Stop Recording</Button>
+            </div>
           </Col>
         </Row>
       </Layout.Container>
       </Panel>
+
+      <Divider orientation='left' style={{background: '#f2f2f2', height: '32px'}}></Divider>
+
+      <Layout.Container>
+        <Row gutter={8}>
+          <Col className="gutter-row" span={8}>
+            <div style={textStyle}>
+            Screen Recording
+            </div>
+          </Col>
+          <Col className="gutter-row" span={16}>
+            <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
+              <Button type="primary" onClick={instance.talkbackOn}>Start Recording</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Pause</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Resume</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Stop Recording</Button>
+            </div>
+          </Col>
+        </Row>
+      </Layout.Container>
 
       <Layout.Container grow>
           <DataTable<DataRow>
@@ -124,6 +148,7 @@ export function Component() {
               columns={instance.columns}
               enableAutoScroll/>
       </Layout.Container>
+
     </Layout.Container>
   );
 }

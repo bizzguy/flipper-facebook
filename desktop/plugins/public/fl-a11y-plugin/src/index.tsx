@@ -85,14 +85,14 @@ export function Component() {
       <Layout.Container gap>
         <Row gutter={8}>
           <Col className="gutter-row" span={4}>
-            <div style={textStyle}>
+            <div style={{marginLeft: 15, marginRight: 5}}>
             Talk Back
             </div>
           </Col>
           <Col className="gutter-row" span={16}>
-            <div style={style}>
+            <div style={{marginLeft: 5, marginRight: 5}}>
               <Button type="primary" onClick={instance.talkbackOn}>Talkback On</Button>
-              <Button type="primary" onClick={instance.talkbackOff}>Talkback Off</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 5, marginRight: 5}}>Talkback Off</Button>
             </div>
           </Col>
         </Row>

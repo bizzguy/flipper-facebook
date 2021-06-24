@@ -180,20 +180,35 @@ export function Component() {
 
       <Layout.Container grow>
         <Row gutter={8}>
-          <Col className="gutter-row" span={8}>
+          <Col className="gutter-row" span={4}>
             <div style={textStyle}>
             Set Language
             </div>
           </Col>
-          <Col className="gutter-row" span={16}>
+          <Col className="gutter-row" span={20}>
             <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
             <Select defaultValue="English (en)" style={{ width: 200 }} onChange={instance.changeLanguage}>
                 <Option value="en">English (en)</Option>
                 <Option value="de-rDE">German (de-rDE)</Option>
                 <Option value="es-rES">Spanish (es-rES)</Option>
-                <Option value="rf-rFR">French (rf-rFR)</Option>
-                <Option value="it-rIT">Italian (it-rIT)</Option>
-                <Option value="nl-rNL">Dutch (nl-rNL)</Option>
+              </Select>
+            </div>
+          </Col>
+        </Row>
+      </Layout.Container>
+
+      <Layout.Container grow>
+        <Row gutter={8}>
+          <Col className="gutter-row" span={4}>
+            <div style={textStyle}>
+            Manage APK
+            </div>
+          </Col>
+          <Col className="gutter-row" span={20}>
+            <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
+            <Select defaultValue="com.footlocker.com" style={{ width: 200 }} onChange={instance.changeLanguage}>
+                <Option value="en">com.champssports.com</Option>
+                <Option value="en">com.footlocker.com</Option>
               </Select>
             </div>
           </Col>

@@ -1,7 +1,9 @@
+// platform internal
 import React from 'react';
+import adb from 'adbkit';
 
+// Legacy UI
 import {
-  createState,
   createDataSource,
   DataTable,
   DataTableColumn, 
@@ -11,13 +13,26 @@ import {
   usePlugin,
 } from 'flipper-plugin';
 
+// Sandy UI
 import {
   Button,
   Col, 
   Divider,
   Row,
-  Space,
 } from 'antd'
+
+// plugin
+import { 
+    AdbBridge, 
+    ClearDataCommand, 
+    RestartCommand, 
+    KillCommand, 
+    ClearDataAndRestartCommand, 
+    UninstallCommand,
+    TalkbackOnCommand,
+    TalkbackOffCommand,
+ } from './command/AllCommands'
+import { NameForm } from './NameForm'
 
 type DataRow = {
   id: number;
@@ -29,6 +44,8 @@ type DataRow = {
 type Events = {
   newRow: DataRow;
 };
+
+type ShellCallBack = (output: string) => any;
 
 const style = { background: '#ffffff', padding: '8px 8' };
 const textStyle = { background: '#ffffff', padding: '12px'};
@@ -50,12 +67,25 @@ export function plugin(client: PluginClient<Events, {}>) {
     rows.append(createRow(payload));
   });
 
+  const device = client.device;
+
+  const executeShell = (callback: ShellCallBack, command: string) => {
+    return (device.realDevice as any).adb
+        .shell(device.serial, command)
+        .then(adb.util.readAll)
+        .then(function (output: { toString: () => { trim: () => string } }) {
+            return callback(output.toString().trim());
+        });
+};
+
+  const adbBridge = new AdbBridge(executeShell);
+
   const talkbackOn = () => {
-    //new TalkbackOnCommand(adbBridge).execute();
+    new TalkbackOnCommand(adbBridge).execute();
   }
 
   const talkbackOff = () => {
-    //new TalkbackOffCommand(adbBridge).execute();
+    new TalkbackOffCommand(adbBridge).execute();
   }
 
   const columns: DataTableColumn<DataRow>[] = [

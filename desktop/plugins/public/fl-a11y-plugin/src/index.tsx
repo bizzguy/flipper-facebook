@@ -18,7 +18,9 @@ import {
   Button,
   Col, 
   Divider,
+  Input,
   Row,
+  Select,
 } from 'antd'
 
 // plugin
@@ -76,7 +78,7 @@ export function plugin(client: PluginClient<Events, {}>) {
         .then(function (output: { toString: () => { trim: () => string } }) {
             return callback(output.toString().trim());
         });
-};
+    };
 
   const adbBridge = new AdbBridge(executeShell);
 
@@ -86,6 +88,10 @@ export function plugin(client: PluginClient<Events, {}>) {
 
   const talkbackOff = () => {
     new TalkbackOffCommand(adbBridge).execute();
+  }
+
+  const changeLanguage = () => {
+    //new TalkbackOffCommand(adbBridge).execute();
   }
 
   const columns: DataTableColumn<DataRow>[] = [
@@ -108,11 +114,16 @@ export function plugin(client: PluginClient<Events, {}>) {
     columns,
     talkbackOn,
     talkbackOff,
+    changeLanguage,
   };
 }
 
 export function Component() {
+
   const instance = usePlugin(plugin);
+
+  const { Option } = Select;
+
   return (
     <Layout.Container grow>
       <Panel title='Device Commands'>
@@ -150,6 +161,45 @@ export function Component() {
           </Col>
         </Row>
       </Layout.Container>
+
+      <Layout.Container grow>
+        <Row gutter={8}>
+          <Col className="gutter-row" span={8}>
+            <div style={textStyle}>
+            Visible Touch
+            </div>
+          </Col>
+          <Col className="gutter-row" span={16}>
+            <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
+              <Button type="primary" onClick={instance.talkbackOn}>Touch On</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Touch Off</Button>
+            </div>
+          </Col>
+        </Row>
+      </Layout.Container>
+
+      <Layout.Container grow>
+        <Row gutter={8}>
+          <Col className="gutter-row" span={8}>
+            <div style={textStyle}>
+            Set Language
+            </div>
+          </Col>
+          <Col className="gutter-row" span={16}>
+            <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
+            <Select defaultValue="English (en)" style={{ width: 200 }} onChange={instance.changeLanguage}>
+                <Option value="en">English (en)</Option>
+                <Option value="de-rDE">German (de-rDE)</Option>
+                <Option value="es-rES">Spanish (es-rES)</Option>
+                <Option value="rf-rFR">French (rf-rFR)</Option>
+                <Option value="it-rIT">Italian (it-rIT)</Option>
+                <Option value="nl-rNL">Dutch (nl-rNL)</Option>
+              </Select>
+            </div>
+          </Col>
+        </Row>
+      </Layout.Container>
+
       </Panel>
 
       <Divider orientation='left' style={{background: '#f2f2f2', height: '32px'}}></Divider>
@@ -158,15 +208,12 @@ export function Component() {
         <Row gutter={8}>
           <Col className="gutter-row" span={8}>
             <div style={textStyle}>
-            Screen Recording
+            Track a11y Events for View
             </div>
           </Col>
-          <Col className="gutter-row" span={16}>
+          <Col className="gutter-row" span={4}>
             <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
-              <Button type="primary" onClick={instance.talkbackOn}>Start Recording</Button>
-              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Pause</Button>
-              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Resume</Button>
-              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Stop Recording</Button>
+                <Input placeholder="View ID" />
             </div>
           </Col>
         </Row>

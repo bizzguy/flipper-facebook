@@ -5,6 +5,7 @@ import adb from 'adbkit';
 // Legacy UI
 import {
   createDataSource,
+  createState,
   DataTable,
   DataTableColumn, 
   Layout, 
@@ -58,7 +59,12 @@ function createRow(event: DataRow) {
   };
 }
 
-export function plugin(client: PluginClient<Events, {}>) {
+type Methods = {
+  volumeDown(params: {}): Promise<void>;
+  volumeUp(params: {}): Promise<void>;
+};
+
+export function plugin(client: PluginClient<Events, Methods>) {
 
   const rows = createDataSource<DataRow>([], {
     limit: 1024 * 10,
@@ -90,6 +96,30 @@ export function plugin(client: PluginClient<Events, {}>) {
     new TalkbackOffCommand(adbBridge).execute();
   }
 
+  const nextMessage = createState('');
+
+  function volumeDown() {
+    if (client.isConnected) {
+      try {
+        console.log("...volumeDown")
+        client.send('volumeDown', {});
+      } catch (e) {
+        console.warn('Error returned from client', e);
+      }
+    }
+  }
+
+  function volumeUp() {
+    if (client.isConnected) {
+      try {
+        console.log("...volumeUp")
+        client.send('volumeUp', {});
+      } catch (e) {
+        console.warn('Error returned from client', e);
+      }
+    }
+  }
+
   const changeLanguage = () => {
     //new TalkbackOffCommand(adbBridge).execute();
   }
@@ -114,6 +144,8 @@ export function plugin(client: PluginClient<Events, {}>) {
     columns,
     talkbackOn,
     talkbackOff,
+    volumeDown,
+    volumeUp,
     changeLanguage,
   };
 }
@@ -126,6 +158,7 @@ export function Component() {
 
   return (
     <Layout.Container grow>
+      
       <Panel title='Device Commands'>
 
       <Layout.Container grow>
@@ -135,10 +168,16 @@ export function Component() {
             Talk Back
             </div>
           </Col>
-          <Col className="gutter-row" span={20}>
+          <Col className="gutter-row" span={4}>
             <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
               <Button type="primary" onClick={instance.talkbackOn}>Talkback On</Button>
               <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Talkback Off</Button>
+            </div>
+          </Col>
+          <Col className="gutter-row" span={12}>
+            <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
+              <Button type="primary" onClick={instance.volumeDown}>Volume Down</Button>
+              <Button type="primary" onClick={instance.volumeUp} style={{marginLeft: 8}}>Volume Up</Button>
             </div>
           </Col>
         </Row>

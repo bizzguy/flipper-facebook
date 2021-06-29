@@ -32,6 +32,7 @@ import {
     KillCommand, 
     ClearDataAndRestartCommand, 
     UninstallCommand,
+    ShowLanguageSettingsCommand,
     TalkbackOnCommand,
     TalkbackOffCommand,
  } from './command/AllCommands'
@@ -86,6 +87,14 @@ export function plugin(client: PluginClient<Events, Methods>) {
         });
     };
 
+  const apks = [
+    'com.footlocker.com',
+    'com.champssports.com',
+    'com.eastbay.com',
+    'com.kidsfootlocker.com',
+    'com.footlocker.europe.uk',
+  ].map((v) => ({value: v, label: v}));
+
   const adbBridge = new AdbBridge(executeShell);
 
   const talkbackOn = () => {
@@ -124,6 +133,10 @@ export function plugin(client: PluginClient<Events, Methods>) {
     //new TalkbackOffCommand(adbBridge).execute();
   }
 
+  const showLanguageSettings = () => {
+    new ShowLanguageSettingsCommand(adbBridge).execute();
+  }
+
   const columns: DataTableColumn<DataRow>[] = [
     {
       key: 'time',
@@ -147,6 +160,8 @@ export function plugin(client: PluginClient<Events, Methods>) {
     volumeDown,
     volumeUp,
     changeLanguage,
+    apks,
+    showLanguageSettings,
   };
 }
 
@@ -226,11 +241,12 @@ export function Component() {
           </Col>
           <Col className="gutter-row" span={20}>
             <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
-            <Select defaultValue="English (en)" style={{ width: 200 }} onChange={instance.changeLanguage}>
+              <Select defaultValue="English (en)" style={{ width: 200 }} onChange={instance.changeLanguage}>
                 <Option value="en">English (en)</Option>
                 <Option value="de-rDE">German (de-rDE)</Option>
                 <Option value="es-rES">Spanish (es-rES)</Option>
               </Select>
+              <Button type="primary" onClick={instance.showLanguageSettings} style={{marginLeft: 16}}>Language Settings</Button>
             </div>
           </Col>
         </Row>
@@ -245,10 +261,15 @@ export function Component() {
           </Col>
           <Col className="gutter-row" span={20}>
             <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
-            <Select defaultValue="com.footlocker.com" style={{ width: 200 }} onChange={instance.changeLanguage}>
-                <Option value="en">com.champssports.com</Option>
-                <Option value="en">com.footlocker.com</Option>
-              </Select>
+              <Select style={{ width: 240 }} 
+                value={"com.footlocker.com"}
+                options={instance.apks}
+                onChange={(text) =>
+                  console.log("...onChange Select")
+                }
+              />
+              <Button type="primary" onClick={instance.talkbackOn} style={{marginLeft: 16}}>Uninstall APK</Button>
+              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Install APK</Button>
             </div>
           </Col>
         </Row>

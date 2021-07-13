@@ -178,19 +178,15 @@ export function Component() {
 
       <Layout.Container grow>
         <Row gutter={8}>
-          <Col className="gutter-row" span={4}>
+          <Col className="gutter-row" span={8}>
             <div style={textStyle}>
             Talk Back
             </div>
           </Col>
-          <Col className="gutter-row" span={4}>
+          <Col className="gutter-row" span={16}>
             <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
               <Button type="primary" onClick={instance.talkbackOn}>Talkback On</Button>
               <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Talkback Off</Button>
-            </div>
-          </Col>
-          <Col className="gutter-row" span={12}>
-            <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
               <Button type="primary" onClick={instance.volumeDown}>Volume Down</Button>
               <Button type="primary" onClick={instance.volumeUp} style={{marginLeft: 8}}>Volume Up</Button>
             </div>

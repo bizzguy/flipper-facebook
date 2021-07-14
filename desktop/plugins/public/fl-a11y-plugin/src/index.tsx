@@ -35,6 +35,8 @@ import {
     ShowLanguageSettingsCommand,
     TalkbackOnCommand,
     TalkbackOffCommand,
+    VisibleTouchOnCommand,
+    VisibleTouchOffCommand,
  } from './command/AllCommands'
 import { NameForm } from './NameForm'
 
@@ -88,10 +90,12 @@ export function plugin(client: PluginClient<Events, Methods>) {
     };
 
   const apks = [
-    'com.footlocker.com',
-    'com.champssports.com',
-    'com.eastbay.com',
-    'com.kidsfootlocker.com',
+    'com.champssports.champssports',
+    'com.eastbay.eastbay',
+    'com.footaction.footaction',
+    'com.footlocker.approved',
+    'com.footlocker.canada',
+    'com.footlocker.kids',
     'com.footlocker.europe.uk',
   ].map((v) => ({value: v, label: v}));
 
@@ -103,6 +107,14 @@ export function plugin(client: PluginClient<Events, Methods>) {
 
   const talkbackOff = () => {
     new TalkbackOffCommand(adbBridge).execute();
+  }
+
+  const visibleTouchOn = () => {
+    new VisibleTouchOnCommand(adbBridge).execute();
+  }
+
+  const visibleTouchOff = () => {
+    new VisibleTouchOffCommand(adbBridge).execute();
   }
 
   const nextMessage = createState('');
@@ -162,6 +174,8 @@ export function plugin(client: PluginClient<Events, Methods>) {
     changeLanguage,
     apks,
     showLanguageSettings,
+    visibleTouchOn,
+    visibleTouchOff,
   };
 }
 
@@ -178,16 +192,16 @@ export function Component() {
 
       <Layout.Container grow>
         <Row gutter={8}>
-          <Col className="gutter-row" span={8}>
+          <Col className="gutter-row" span={4}>
             <div style={textStyle}>
             Talk Back
             </div>
           </Col>
-          <Col className="gutter-row" span={16}>
+          <Col className="gutter-row" span={20}>
             <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
               <Button type="primary" onClick={instance.talkbackOn}>Talkback On</Button>
               <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Talkback Off</Button>
-              <Button type="primary" onClick={instance.volumeDown}>Volume Down</Button>
+              <Button type="primary" onClick={instance.volumeDown} style={{marginLeft: 24}}>Volume Down</Button>
               <Button type="primary" onClick={instance.volumeUp} style={{marginLeft: 8}}>Volume Up</Button>
             </div>
           </Col>
@@ -203,11 +217,12 @@ export function Component() {
           </Col>
           <Col className="gutter-row" span={20}>
             <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
-              <Button type="primary" onClick={instance.talkbackOn}>Start Recording</Button>
-              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Pause</Button>
-              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Resume</Button>
-              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Stop Recording</Button>
-            </div>
+              <Button disabled={true} type="primary" onClick={instance.talkbackOn}>Start Recording</Button>
+              <Button disabled={true} type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Pause</Button>
+              <Button disabled={true} type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Resume</Button>
+              <Button disabled={true} type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Stop Recording</Button>
+              <Button disabled={true} type="primary" onClick={instance.talkbackOff} style={{marginLeft: 24}}>Save Recording</Button>
+          </div>
           </Col>
         </Row>
       </Layout.Container>
@@ -221,8 +236,8 @@ export function Component() {
           </Col>
           <Col className="gutter-row" span={20}>
             <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
-              <Button type="primary" onClick={instance.talkbackOn}>Touch On</Button>
-              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Touch Off</Button>
+              <Button type="primary" onClick={instance.visibleTouchOn}>Touch On</Button>
+              <Button type="primary" onClick={instance.visibleTouchOff} style={{marginLeft: 8}}>Touch Off</Button>
             </div>
           </Col>
         </Row>
@@ -241,6 +256,9 @@ export function Component() {
                 <Option value="en">English (en)</Option>
                 <Option value="de-rDE">German (de-rDE)</Option>
                 <Option value="es-rES">Spanish (es-rES)</Option>
+                <Option value="fr-rFR">French (fr-rFR)</Option>
+                <Option value="it-rIT">Italian (it-rIT)</Option>
+                <Option value="nl-rNL">Dutch (nl-rNL)</Option>
               </Select>
               <Button type="primary" onClick={instance.showLanguageSettings} style={{marginLeft: 16}}>Language Settings</Button>
             </div>
@@ -257,15 +275,15 @@ export function Component() {
           </Col>
           <Col className="gutter-row" span={20}>
             <div style={{marginTop: 8, marginBottom: 8, marginLeft: 8, marginRight: 8}}>
-              <Select style={{ width: 240 }} 
-                value={"com.footlocker.com"}
+              <Select style={{ width: 255 }} 
+                value={"com.footlocker.approved"}
                 options={instance.apks}
                 onChange={(text) =>
                   console.log("...onChange Select")
                 }
               />
-              <Button type="primary" onClick={instance.talkbackOn} style={{marginLeft: 16}}>Uninstall APK</Button>
-              <Button type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Install APK</Button>
+              <Button disabled={true} type="primary" onClick={instance.talkbackOn} style={{marginLeft: 16}}>Uninstall APK</Button>
+              <Button disabled={true} type="primary" onClick={instance.talkbackOff} style={{marginLeft: 8}}>Install APK</Button>
             </div>
           </Col>
         </Row>
